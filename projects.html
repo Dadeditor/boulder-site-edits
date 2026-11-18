@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boulder Research — Projects &amp; live services</title>
+  <meta name="description" content="Boulder Research ships research as usable services. Warp Core runs thousands of copies of a Godot game on a GPU, checks them against Godot and traces faults to their source." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="projects.css" />
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+    <nav class="nav">
+    <a href="index.html" class="brand" aria-label="Boulder Research home"></a>
+    <div class="nav-links mono">
+      <a href="index.html" class="hide-sm">Home</a>
+      <div class="nav-drop">
+        <a href="projects.html" aria-current="page">Projects</a>
+        <button type="button" class="nav-drop-toggle" aria-expanded="false" aria-label="Show the Projects menu">▾</button>
+        <div class="nav-drop-menu">
+          <a href="project-warp-core.html">Warp Core</a>
+          <a href="project-miniloader.html">Miniloader</a>
+          <a href="project-astrolabe.html">Astrolabe</a>
+          <a href="research.html">Research</a>
+        </div>
+      </div>
+      <a href="investors.html" class="hide-sm">Investors</a>
+      <a href="about.html" class="hide-sm">About</a>
+      <a class="btn" href="mailto:chris@kellogg.io?subject=Research">Get in touch</a>
+  </nav>
+  <script>
+  // T-439: a touchscreen has no hover, so the caret is a real button that
+  // pins the dropdown open on tap (the CSS reads .is-open). Hover still
+  // opens it for a mouse pointer.
+  (function () {
+    const drop = document.querySelector(".nav-drop");
+    const caret = drop && drop.querySelector(".nav-drop-toggle");
+    if (!caret) return;
+    caret.addEventListener("click", () => {
+      const open = drop.classList.toggle("is-open");
+      caret.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  })();
+  </script>
+
+  <header class="page-head">
+    <div class="wrap">
+      <div class="crumbs mono"><a href="index.html">Boulder Research</a> / Projects</div>
+      <p class="ship-note mono"><b>Projects ship.</b> Research feeds them.</p>
+      <h1>Research that<br><span class="serif">ships.</span></h1>
+      <p class="lede">We don't stop at the paper. When a piece of research works, we turn it into something you can <b>use, pilot, and pay for</b>. Each project below has its own page: what it is, where its release stands, what the demo shows, and how to work with us on it. The essays in <a href="research.html">Research</a> are the open-ended thinking these projects grew out of.</p>
+    </div>
+  </header>
+
+  <section class="alt" id="live">
+    <div class="wrap">
+      <div class="sec-head mono"><span>01 / Services</span><span>Two projects · one adjacent product</span></div>
+      <div class="cards">
+        <a class="card" href="project-warp-core.html">
+          <div class="card-top mono"><span>Project 01</span><span class="status">Prototype · pilots open</span></div>
+          <img src="warp-viewer.png" alt="Godot window drawing one operation and its conditions streamed live from a GPU simulation" />
+          <div class="inner">
+            <h3>Warp Core</h3>
+            <div class="who">thousands of operations and conditions, one GPU</div>
+            <p>A Godot game's rules and physics, run as GPU kernels across thousands of independent copies at once. Godot becomes the window you watch one copy through.</p>
+            <dl>
+              <div><dt>What you get</dt><dd>Bulk simulation of your Godot scene, with bug findings from thousands of parallel runs, parity gates against Godot and fault traces to the variable where each began.</dd></div>
+              <div><dt>Measured</dt><dd>5.05M world-steps/sec at 4,096 operations and conditions; 10 of 10 injected bug classes traced. Simple test scene.</dd></div>
+              <div><dt>Engage</dt><dd>Design-partner pilot, scoped per studio.</dd></div>
+            </dl>
+            <span class="more mono">Project page →</span>
+          </div>
+        </a>
+        <a class="card" href="project-miniloader.html">
+          <div class="card-top mono"><span>Project 02</span><span class="status">Research project · Early access</span></div>
+          <div class="inner">
+            <h3>Miniloader</h3>
+            <div class="who">AI on your own hardware</div>
+            <p>A visual control panel for running agents, models and tools on your own machine: modules slot in, wire themselves up and report their status live. A Boulder Research research project that ships.</p>
+            <dl>
+              <div><dt>Where</dt><dd>miniloader.ai</dd></div>
+            </dl>
+            <span class="more mono">Project page →</span>
+          </div>
+        </a>
+        <a class="card" href="project-astrolabe.html">
+          <div class="card-top mono"><span>Adjacent product</span><span class="status">Hosted service</span></div>
+          <div class="inner">
+            <h3>Astrolabe</h3>
+            <div class="who">agents that work where you work</div>
+            <p>A hosted subscription agent service for Slack, email, calendar, files and GitHub. The hosted sibling of Miniloader; not a Boulder Research research project.</p>
+            <dl>
+              <div><dt>Where</dt><dd>astrolabe.miniloader.ai</dd></div>
+            </dl>
+            <span class="more mono">Project page →</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="stages">
+    <div class="wrap">
+      <div class="sec-head mono"><span>02 / How we label releases</span><span>So you know what you're buying</span></div>
+      <div class="split">
+        <h2>Every claim<br><span class="serif">has a status.</span></h2>
+        <p class="body">We label each project by how far it has actually got, and we state the conditions behind every number. A prototype is a prototype. Nothing on these pages is described as more finished than it is.</p>
+      </div>
+      <div class="stages">
+        <div class="stage done"><span class="mono">Stage 1</span><b>Research</b><p>An idea with early experiments. Not something you can use yet.</p></div>
+        <div class="stage now"><span class="mono">Stage 2 · Warp Core</span><b>Prototype</b><p>Works and is measured on test scenes. Available through hands-on pilots with us.</p></div>
+        <div class="stage"><span class="mono">Stage 3</span><b>Pilot</b><p>Running on design partners' own games, with findings delivered to them.</p></div>
+        <div class="stage"><span class="mono">Stage 4</span><b>Generally available</b><p>Self-serve or managed service with published terms.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt" id="next">
+    <div class="wrap">
+      <div class="sec-head mono"><span>03 / In research</span><span>Not services yet</span></div>
+      <p class="body">The same platform points at other operations and conditions. These are research directions from our <a href="index.html#products">product groups</a>, and they get project pages when they have something you can use.</p>
+      <div class="directions">
+        <div><span class="mono">Research · foundation exists</span><b>Robot manipulation</b><p>All 130 LIBERO manipulation tasks ported to MuJoCo Warp, with sim-to-real transfer to a physical arm.</p></div>
+        <div><span class="mono">Research</span><b>Industrial &amp; IoT</b><p>Simulate rare failures first, then train detectors before they watch a real sensor.</p></div>
+        <div><span class="mono">Early exploration</span><b>Cybersecurity</b><p>Anomaly models for networks and systems, run on the customer's own hardware.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="research" aria-labelledby="research-title">
+    <div class="wrap">
+      <div class="sec-head mono"><span>04 / The research behind it</span><span>Open-ended, pointed at these projects</span></div>
+      <div class="split">
+        <h2 id="research-title">Research is the<br><span class="serif">input.</span></h2>
+        <p class="body">A project starts when an idea is defined enough to ship: it gets a page, a status and a way to pilot or buy it. The essays behind it stay open-ended — that is where we test whether an idea holds, including the results that didn't. The <a href="research.html">Research</a> track is grouped by topic: operations and conditions, simulation architecture, verification, hardware and method.</p>
+        <div class="research-links mono">
+          <b>Start here</b>
+          <a href="research.html">All research</a>
+          <a href="research-engine-is-the-window.html">The engine is the window</a>
+          <a href="research-rules-and-faults.html">Rules declared once</a>
+          <a href="research-four-gpus.html">Four GPUs, measured</a>
+          <a href="research-two-audits.html">The test passed. The claim was still wrong.</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta" id="contact">
+    <div class="wrap">
+      <h2>Want to try it<br><span class="serif">on your operation and conditions?</span></h2>
+      <p class="body">Tell us about your game or system. We'll tell you honestly whether a pilot makes sense yet.</p>
+      <div class="ctas">
+        <a class="btn" href="mailto:chris@kellogg.io?subject=Pilot%20enquiry">Start a conversation →</a>
+        <a class="btn ghost" href="index.html">Back to home</a>
+      </div>
+      <footer class="mono">
+        <span>© 2026 Boulder Research</span>
+        <a href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+        <span class="portfolio-links">Portfolio: <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person</a> · <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware</a></span>
+        <span>Intelligence for operations and conditions</span>
+      </footer>
+    </div>
+  </section>
+</body>
+</html>

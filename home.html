@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boulder Research — Know what happens next</title>
+  <!-- T-480: the home page is the domain root. home.html is published only as
+       a redirect stub so /home.html lands on / instead of being a second,
+       separately indexable copy of the front page. T-492 adds a true HTTP 301
+       for /home.html at CloudFront (scripts/edge/home-redirect.js); this stub is
+       the fallback for any edge where that function is not yet attached. -->
+  <meta http-equiv="refresh" content="0; url=/" />
+  <link rel="canonical" href="/" />
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+  <p>Boulder Research's home page is at the root of the domain: <a href="/">boulderresearch.ai</a>.</p>
+</body>
+</html>

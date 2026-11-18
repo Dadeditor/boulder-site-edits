@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — Boulder Research</title>
+  <meta name="description" content="Who Boulder Research is, how the site is organised, and how the company, the people and the products connect: boulderresearch.ai, kellogg.io and miniloader.ai." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="projects.css" />
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+  <nav class="nav">
+    <a href="index.html" class="brand" aria-label="Boulder Research home"></a>
+    <div class="nav-links mono">
+      <a href="index.html" class="hide-sm">Home</a>
+      <div class="nav-drop">
+        <a href="projects.html">Projects</a>
+        <button type="button" class="nav-drop-toggle" aria-expanded="false" aria-label="Show the Projects menu">▾</button>
+        <div class="nav-drop-menu">
+          <a href="project-warp-core.html">Warp Core</a>
+          <a href="project-miniloader.html">Miniloader</a>
+          <a href="project-astrolabe.html">Astrolabe</a>
+          <a href="research.html">Research</a>
+        </div>
+      </div>
+      <a href="investors.html" class="hide-sm">Investors</a>
+      <a href="about.html" aria-current="page">About</a>
+      <a class="btn" href="mailto:chris@kellogg.io?subject=About%20Boulder%20Research">Get in touch</a>
+    </div>
+  </nav>
+  <script>
+  // T-439: a touchscreen has no hover, so the caret is a real button that
+  // pins the dropdown open on tap (the CSS reads .is-open). Hover still
+  // opens it for a mouse pointer.
+  (function () {
+    const drop = document.querySelector(".nav-drop");
+    const caret = drop && drop.querySelector(".nav-drop-toggle");
+    if (!caret) return;
+    caret.addEventListener("click", () => {
+      const open = drop.classList.toggle("is-open");
+      caret.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  })();
+  </script>
+
+  <header class="page-head">
+    <div class="wrap">
+      <div class="crumbs mono"><a href="index.html">Boulder Research</a> / About</div>
+      <h1>The company,<br><span class="serif">plainly.</span></h1>
+      <p class="lede">Boulder Research is a small company building software for <b>an operation and its conditions</b>: AI that predicts how they respond to action, grounded in a real simulation and efficient enough to run on a single GPU. Three people, two cities, one product in pilots.</p>
+    </div>
+  </header>
+
+  <section class="alt" id="people">
+    <div class="wrap">
+      <div class="sec-head mono"><span>01 / People</span><span>Boulder, CO · Boston, MA</span></div>
+      <h2>Who is<br><span class="serif">behind it.</span></h2>
+      <div class="features">
+        <div>
+          <span class="mono">Adhitya Mohan</span>
+          <p><b>ML systems &amp; robotics.</b> Author of the Warp Core paper; GPU simulation and robot manipulation. <a href="https://amohan.dev/" target="_blank" rel="noopener">amohan.dev ↗</a></p>
+        </div>
+        <div>
+          <span class="mono">Akhil Srinivas</span>
+          <p><b>Time series &amp; anomaly detection.</b> PhD in Computer Science; anomaly models for industrial systems. <a href="https://www.linkedin.com/in/tvas" target="_blank" rel="noopener">LinkedIn ↗</a></p>
+        </div>
+        <div>
+          <span class="mono">Chris Kellogg</span>
+          <p><b>AI product &amp; infrastructure.</b> Takes concepts to running systems; built and runs Miniloader. <a href="https://kellogg.io/" target="_blank" rel="noopener">kellogg.io ↗</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!--
+    The portfolio link map. Three namespaces, on purpose:
+    the person (kellogg.io), the company (boulderresearch.ai),
+    and miniloader.ai (Miniloader, a Boulder Research research project that ships;
+    it runs on its own domain).
+    Astrolabe (astrolabe.miniloader.ai) is an adjacent hosted product, not a research project.
+  -->
+  <section id="map">
+    <div class="wrap">
+      <div class="sec-head mono"><span>02 / The link map</span><span>Person · company · product</span></div>
+      <h2>Three sites,<br><span class="serif">three different things.</span></h2>
+      <p class="lede">Chris Kellogg builds and runs a small portfolio of connected work. Boulder Research, founded with Adhitya Mohan and Akhil S, is the company: it researches how an operation and its conditions respond, on a single GPU, starting with Warp Core, which runs thousands of copies of a Godot game in parallel, checks them against the engine and traces faults to their cause. Miniloader is the product: a local-AI platform for running agents and models on your own hardware. Chris is the person behind both, covering product, rapid prototyping and AI infrastructure, and turning research into shipped software.</p>
+      <div class="features">
+        <div>
+          <span class="mono">boulderresearch.ai</span>
+          <p><b>The company.</b> This site: the company story, the projects and the research that feeds them, and the investor materials.</p>
+        </div>
+        <div>
+          <span class="mono">kellogg.io</span>
+          <p><b>The person.</b> Chris Kellogg's personal site. One of the founders, separate from the company and its work.</p>
+        </div>
+        <div>
+          <span class="mono">miniloader.ai</span>
+          <p><b>Miniloader, a research project.</b> Miniloader is a visual control panel for running agents, models and tools on your own hardware — a research project of Boulder Research that ships. It runs on its own domain; see its <a href="project-miniloader.html">project page</a>. Its hosted sibling, <a href="project-astrolabe.html">Astrolabe</a> (astrolabe.miniloader.ai), is an adjacent product, not a research project.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt" id="site-map">
+    <div class="wrap">
+      <div class="sec-head mono"><span>03 / Site map</span><span>Where everything lives</span></div>
+      <h2>How the site<br><span class="serif">is organised.</span></h2>
+      <div class="features">
+        <div>
+          <span class="mono">Home</span>
+          <p><a href="index.html">index.html</a> — the company story, from the thesis to the team. Served at the root of the domain.</p>
+        </div>
+        <div>
+          <span class="mono">Projects</span>
+          <p><a href="projects.html">projects.html</a> — the menu item for everything that ships: <a href="project-warp-core.html">Warp Core</a>, <a href="project-miniloader.html">Miniloader</a> and <a href="project-astrolabe.html">Astrolabe</a>. "Projects" in the top menu opens a dropdown into these pages.</p>
+        </div>
+        <div>
+          <span class="mono">Research</span>
+          <p><a href="research.html">research.html</a> — the technical essays, grouped by topic (operations and conditions, simulation architecture, verification, hardware, method), not a flat list. It is not a top-level menu item: Research sits inside the Projects dropdown, because the essays feed the projects rather than standing on their own.</p>
+        </div>
+        <div>
+          <span class="mono">Investors</span>
+          <p><a href="investors.html">investors.html</a> — the fundraising track. The drafts <a href="brief.html">brief.html</a> and <a href="warp-core-brief.html">warp-core-brief.html</a> live here, not in the top menu, so they are never mistaken for research.</p>
+        </div>
+        <div>
+          <span class="mono">For reference</span>
+          <p>The design studies <b>archive/homepage-concepts.html</b> (five front-page concepts) and <b>archive/what-happens-next.html</b> (an earlier front-page design) are kept in the repo's <b>archive/</b> directory for reference. They are not published and are not part of the menu, so they are named here rather than linked.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta" id="contact">
+    <div class="wrap">
+      <h2>Questions about<br><span class="serif">the company?</span></h2>
+      <p class="body">About the team, the work, or how the pieces connect — the fastest way is a direct line.</p>
+      <div class="ctas">
+        <a class="btn" href="mailto:chris@kellogg.io?subject=About%20Boulder%20Research">Get in touch →</a>
+        <a class="btn ghost" href="index.html">Back to the story</a>
+      </div>
+      <footer class="mono">
+        <span>© 2026 Boulder Research</span>
+        <a href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+        <span class="portfolio-links">Portfolio: <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person</a> · <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware</a></span>
+        <span>Intelligence for operations and conditions</span>
+      </footer>
+    </div>
+  </section>
+</body>
+</html>

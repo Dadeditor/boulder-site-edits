@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boulder Research — Technical &amp; Investment Brief</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #efede7;
+      --paper-2: #e6e3db;
+      --ink: #0b0b0c;
+      --ink-2: #3a3a3d;
+      --muted: #75736d;
+      --rule: rgba(11, 11, 12, .16);
+      --predict: #2b4bff;
+      --fault: #ff3d2e;
+      --display: "Archivo", "Arial Narrow", sans-serif;
+      --serif: "Instrument Serif", Georgia, serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body {
+      margin: 0;
+      background: #d9d6ce;
+      color: var(--ink);
+      font-family: var(--display);
+      font-size: 13.5px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .page {
+      width: 8.5in;
+      min-height: 11in;
+      margin: 32px auto;
+      padding: .6in .7in .5in;
+      background: var(--paper);
+      box-shadow: 0 10px 40px rgba(0,0,0,.12);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .runner {
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: 10px;
+      margin-bottom: 22px;
+      border-bottom: 1.5px solid var(--ink);
+    }
+    .folio { margin-top: auto; padding-top: 8px; display: flex; justify-content: space-between; color: var(--muted); }
+    .mono { font-family: var(--mono); font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; }
+    .serif { font-family: var(--serif); font-weight: 400; font-style: italic; }
+    .blue { color: var(--predict); }
+
+    h1 {
+      margin: 0;
+      font-size: 76px;
+      line-height: .86;
+      font-weight: 850;
+      font-variation-settings: "wdth" 72;
+      text-transform: uppercase;
+    }
+    h1 .serif { text-transform: none; font-size: 1.04em; letter-spacing: -.02em; }
+    h2 {
+      margin: 0 0 12px;
+      font-size: 30px;
+      line-height: .95;
+      font-weight: 850;
+      font-variation-settings: "wdth" 74;
+      text-transform: uppercase;
+    }
+    h2 .serif { text-transform: none; font-size: 1.06em; }
+    h3 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      font-weight: 800;
+      font-variation-settings: "wdth" 82;
+      text-transform: uppercase;
+      letter-spacing: .01em;
+    }
+    p { margin: 0 0 10px; color: var(--ink-2); }
+    p b, li b { color: var(--ink); font-weight: 650; }
+    .sec { margin-bottom: 22px; break-inside: avoid; }
+    .sec-n { color: var(--predict); margin-bottom: 8px; }
+    .lead { font-size: 16px; line-height: 1.5; color: var(--ink); }
+    .pull {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 26px;
+      line-height: 1.15;
+      margin: 18px 0;
+      padding-left: 16px;
+      border-left: 3px solid var(--predict);
+      color: var(--ink);
+    }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+    .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+    /* cover */
+    .cover { justify-content: space-between; background: var(--ink); color: var(--paper); }
+    .cover .runner { border-color: var(--paper); color: rgba(239,237,231,.6); }
+    .cover-logo { width: 150px; }
+    .cover h1 { color: var(--paper); font-size: 88px; }
+    .cover h1 .serif { color: #8fa3ff; }
+    .cover .sub { font-size: 18px; line-height: 1.5; color: rgba(239,237,231,.75); max-width: 5.4in; margin: 22px 0 0; }
+    .ask {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid rgba(239,237,231,.3);
+      border-bottom: 1px solid rgba(239,237,231,.3);
+    }
+    .ask div { padding: 16px 14px 18px 0; }
+    .ask div + div { padding-left: 14px; border-left: 1px solid rgba(239,237,231,.2); }
+    .ask .mono { color: rgba(239,237,231,.5); margin-bottom: 6px; }
+    .ask b { display: block; font-size: 30px; font-weight: 850; font-variation-settings: "wdth" 70; line-height: 1; }
+    .ask span.s { font-size: 12px; color: rgba(239,237,231,.6); }
+    .cover .folio { color: rgba(239,237,231,.45); }
+
+    /* summary box */
+    .box { border: 1.5px solid var(--ink); padding: 18px 20px; margin: 4px 0 24px; background: rgba(255,255,255,.3); }
+    .box ul { margin: 0; padding: 0; list-style: none; }
+    .box li { padding: 7px 0 7px 22px; border-bottom: 1px dashed var(--rule); position: relative; color: var(--ink-2); }
+    .box li:last-child { border-bottom: 0; }
+    .box li::before { content: "→"; position: absolute; left: 0; font-family: var(--mono); color: var(--predict); }
+
+    /* tables */
+    table { width: 100%; border-collapse: collapse; margin: 6px 0 14px; font-size: 13px; }
+    th { text-align: left; font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 500; padding: 8px 10px 8px 0; border-bottom: 1.5px solid var(--ink); }
+    td { padding: 7px 10px 7px 0; border-bottom: 1px solid var(--rule); vertical-align: top; color: var(--ink-2); }
+    td b { color: var(--ink); }
+    td.num { font-family: var(--mono); font-size: 12px; color: var(--ink); white-space: nowrap; }
+    .cap { color: var(--muted); margin-top: -4px; margin-bottom: 8px; }
+
+    /* stats */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1.5px solid var(--ink); border-left: 1px solid var(--rule); margin: 8px 0 18px; }
+    .stat { padding: 14px 14px 16px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+    .stat .n { font-size: 38px; font-weight: 850; font-variation-settings: "wdth" 70; line-height: 1; }
+    .stat .n small { font-size: .45em; margin-left: 3px; }
+    .stat p { font-size: 12px; line-height: 1.45; margin: 8px 0 0; }
+
+    /* map */
+    .map { border-top: 1.5px solid var(--ink); }
+    .map-row { display: grid; grid-template-columns: 28px 1fr 1fr; gap: 18px; padding: 14px 0; border-bottom: 1px solid var(--rule); break-inside: avoid; }
+    .map-row .idx { font-family: var(--mono); font-size: 11px; color: var(--predict); padding-top: 2px; }
+    .map-row p { margin: 0; font-size: 13.5px; }
+    .map-row .paper { font-family: var(--serif); font-style: italic; font-size: 17px; line-height: 1.3; color: var(--ink); }
+    .map-row .paper .mono { display: block; font-style: normal; color: var(--muted); margin-bottom: 4px; font-family: var(--mono); }
+
+    /* funds */
+    .fund-bar { display: flex; height: 26px; margin: 12px 0 6px; border: 1.5px solid var(--ink); }
+    .fund-bar i { display: block; height: 100%; border-right: 1.5px solid var(--paper); }
+    .legend-row { display: flex; align-items: center; gap: 10px; }
+    .sw { width: 12px; height: 12px; display: inline-block; flex: none; }
+    .timeline { border-top: 1.5px solid var(--ink); display: grid; grid-template-columns: 1fr 1fr; column-gap: 28px; }
+    .tl { padding: 10px 0; border-bottom: 1px solid var(--rule); break-inside: avoid; }
+    .tl .when { font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--predict); margin-bottom: 4px; }
+    .tl ul { margin: 4px 0 0; padding-left: 16px; color: var(--ink-2); font-size: 13px; }
+    .tl li { margin: 2px 0; }
+
+    .claims { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .claims ul { margin: 0; padding-left: 16px; font-size: 13px; color: var(--ink-2); }
+    .claims li { margin: 3px 0; }
+    .tag { display: inline-block; font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; padding: 3px 6px; border: 1px solid currentColor; margin-bottom: 10px; }
+
+    .person h3 { font-size: 22px; font-variation-settings: "wdth" 74; margin-bottom: 0; }
+    .person .role { font-family: var(--serif); font-style: italic; color: var(--predict); font-size: 17px; margin-bottom: 8px; }
+    .person ul { margin: 0; padding-left: 16px; font-size: 13px; color: var(--ink-2); }
+    .person li { margin: 3px 0; }
+
+    .closing { background: var(--ink); color: var(--paper); padding: 20px 24px; margin-top: 4px; }
+    .closing h2 { color: var(--paper); margin-bottom: 10px; }
+    .closing h2 .serif { color: #8fa3ff; }
+    .closing p { color: rgba(239,237,231,.72); margin: 0; }
+
+    .draft { color: var(--fault); }
+    svg text { font-family: var(--mono); }
+
+    @page { size: letter; margin: 0; }
+    @media print {
+      body { background: var(--paper); }
+      .page { margin: 0; box-shadow: none; width: 8.5in; height: 11in; min-height: 0; overflow: hidden; break-after: page; }
+      .page:last-child { break-after: auto; }
+    }
+    /* Investor-track label (screen only; hidden when printed) */
+    .track-bar { position: sticky; top: 0; z-index: 10; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 18px; padding: 10px 18px; background: var(--ink); color: var(--paper); font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+    .track-bar b { color: #ff3d2e; font-weight: 500; }
+    .track-bar a { color: #8fa3ff; }
+    @media print { .track-bar { display: none; } }
+  </style>
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+<div class="track-bar"><span><b>Investor track</b> · Draft for discussion · <a href="investors.html">All investor materials</a></span><span>Technical detail in Research: <a href="research-frame-is-not-a-token.html">A frame is not a token</a> · <a href="research-four-open-problems.html">Four open problems</a></span></div>
+
+<!-- ============ COVER ============ -->
+<section class="page cover">
+  <div>
+    <div class="runner mono"><span>Boulder Research</span><span>Technical &amp; investment brief · Pre-seed</span></div>
+    <img class="cover-logo" src="logo-paper.png" alt="Boulder Research" />
+  </div>
+  <div>
+    <div class="mono" style="color:#8fa3ff;margin-bottom:18px">Interactive world models</div>
+    <h1>Understand<br>the world.<br><span class="serif">Leave the datacenter behind.</span></h1>
+    <p class="sub">We're raising $500,000 to build AI that predicts how a world responds to action. It's grounded in real simulation and engineered to run on hardware a small team can own, starting with autonomous testing for games.</p>
+  </div>
+  <div>
+    <div class="ask">
+      <div><div class="mono">Raising</div><b>$500K</b><span class="s">Pre-seed</span></div>
+      <div><div class="mono">Runway</div><b>18 mo</b><span class="s">To seed-ready evidence</span></div>
+      <div><div class="mono">First market</div><b>Godot</b><span class="s">Autonomous game testing</span></div>
+      <div><div class="mono">First hardware</div><b>16 GB</b><span class="s">One local GPU</span></div>
+    </div>
+    <div class="folio mono"><span>boulderresearch.ai</span><span>October 2026 · Draft for discussion</span></div>
+  </div>
+</section>
+
+<!-- ============ PAGE 2: SUMMARY + PROBLEM ============ -->
+<section class="page">
+  <div class="runner mono"><span>Boulder Research</span><span>01 · Summary</span></div>
+
+  <div class="sec">
+    <div class="sec-n mono">01 / The short version</div>
+    <h2>AI can describe the world.<br><span class="serif">It can't yet predict it.</span></h2>
+    <p class="lead">Ask a language model what happens when a knife is pushed off a counter and it will say the knife falls. Ask a world model the same thing and it has to produce the fall: the slide, the tip, the rotation, the bounce. One states the outcome. The other has to produce the process. That second ability is what robots, simulators, and autonomous testing need, and it doesn't come from scaling the first.</p>
+    <div class="box">
+      <ul>
+        <li><b>The problem.</b> Predicting observations costs orders of magnitude more than predicting text, errors compound instead of staying local, and the standard metrics reward plausible-looking frames over correct physics. Today's answer is the datacenter.</li>
+        <li><b>Our thesis.</b> Scale isn't the bottleneck. Representation and systems are. A hybrid model that imagines with a learned network, checks against a real engine, and manages memory like an operating system can do useful work on one GPU.</li>
+        <li><b>Why games first.</b> Games are the one domain where you can reload a state and try a different action. That gives counterfactual data for free, a decision-level metric (did it find the bug?), and paying customers.</li>
+        <li><b>The ask.</b> <b>$500K</b> over 18 months to ship a Godot testing pilot, publish a decision-level benchmark, demonstrate interactive rollouts on a 16 GB GPU, and reach seed-ready customer evidence.</li>
+      </ul>
+    </div>
+    <div class="pull">“The language model states the outcome. The world model has to produce the process.”</div>
+    <p>Robots, simulators, digital twins, and automated testing all depend on the second kind of model. Today it's built by the few organizations that can afford to brute-force it in a datacenter. We think the bottleneck is what the model holds while it predicts, not how big it is, and that a small team with the right systems skills can attack it directly.</p>
+  </div>
+
+  <div class="folio mono"><span>Boulder Research · Confidential draft</span><span>2</span></div>
+</section>
+
+<!-- ============ PAGE 3: PROBLEM ============ -->
+<section class="page">
+  <div class="runner mono"><span>Boulder Research</span><span>02 · The problem</span></div>
+
+  <div class="sec">
+    <div class="sec-n mono">02 / Why the datacenter is the default</div>
+    <h2>A frame is not <span class="serif">a token.</span></h2>
+    <p>The language-model playbook (collect everything, predict the next unit, scale) worked because text is already compressed by the humans who wrote it. Video arrives raw. The arithmetic from our working paper:</p>
+    <div class="stats">
+      <div class="stat"><div class="n">1.5M</div><p>Tokens' worth of bytes in one raw 1080p frame. A single frame outweighs a million-token context.</p></div>
+      <div class="stat"><div class="n">0.2<small>sec</small></div><p>Of video held by a 131,072-token context. The same window holds a novel for a language model.</p></div>
+      <div class="stat"><div class="n">~1,250×</div><p>Attention comparisons for one 20-step diffusion frame vs. one token at a 4K context.</p></div>
+      <div class="stat"><div class="n">200<small>GB</small></div><p>KV cache for one minute of rollout (reported by WorldKV), more than a single B200 holds.</p></div>
+      <div class="stat"><div class="n">33<small>GB</small></div><p>Cache for a ten-second rollout. One session fills a 32 GB device, so batching collapses.</p></div>
+      <div class="stat"><div class="n">3.6×</div><p>Slower than real time: a naive robot-control path takes 5.7 s for each 1.6 s action chunk (DreamZero).</p></div>
+    </div>
+    <p>Industry fixes exist (distillation, step reuse, split guidance, quantization) and stack to roughly 38× on a GB200. They shorten or hide the same loop. <b>None changes what the model holds while it predicts</b>, which is where the cost comes from.</p>
+  </div>
+
+  <div class="sec">
+    <div class="sec-n mono">03 / Why more compute doesn't fix it</div>
+    <h2>Compute buys fidelity.<br><span class="serif">Not correctness.</span></h2>
+    <div class="three">
+      <div><h3>The loss</h3><p>Pixel and diffusion losses measure distance to one recording. A cup landing a centimeter to the left is physically correct and still penalized, so models learn to blur between futures.</p></div>
+      <div><h3>The units</h3><p>Video encoders discard detail inside each 8-pixel cell and each 4-frame stride. Contact and velocity live exactly there, so no larger model downstream can recover them.</p></div>
+      <div><h3>The errors</h3><p>A wrong token is local and recoverable. A drifted pixel feeds the next frame. A ten-second rollout is 240 predictions, each built on the last one's mistakes.</p></div>
+    </div>
+    <div class="pull">“A blurry model that gets the physics right beats a sharp model that gets it wrong. The planner consumes the physics.”</div>
+  </div>
+
+  <div class="folio mono"><span>Boulder Research · Confidential draft</span><span>3</span></div>
+</section>
+
+<!-- ============ PAGE 4: THESIS ============ -->
+<section class="page">
+  <div class="runner mono"><span>Boulder Research</span><span>03 · Thesis</span></div>
+
+  <div class="sec">
+    <div class="sec-n mono">04 / Our thesis</div>
+    <h2>Four problems.<br><span class="serif">One company built around them.</span></h2>
+    <p>Our paper closes by naming four open problems that would change what world models can do. None of them is a matter of more compute. Boulder Research is built to work on all four at once:</p>
+    <div class="map">
+      <div class="map-row">
+        <div class="idx">01</div>
+        <div class="paper"><span class="mono">The paper</span>A state that can be both read and drawn.</div>
+        <p><b>Hybrid state.</b> The game engine holds explicit, readable state (positions, rules, inventory). The learned model handles appearance and fast imagination, and is periodically re-anchored to the engine so drift can't compound.</p>
+      </div>
+      <div class="map-row">
+        <div class="idx">02</div>
+        <div class="paper"><span class="mono">The paper</span>Counterfactual data with a measured gap.</div>
+        <p><b>Games replay.</b> The real world can't be reset to try a different action, but a game can. Save states give unlimited "what if I'd done X" trajectories, which is the data planning needs and recording can't provide.</p>
+      </div>
+      <div class="map-row">
+        <div class="idx">03</div>
+        <div class="paper"><span class="mono">The paper</span>A metric that tracks decisions, not frames.</div>
+        <p><b>Bugs found.</b> Our product metric is the decision metric: did the agent complete the level, find the crash, reproduce the stuck state? It's scored by the engine, not by how the frame looks.</p>
+      </div>
+      <div class="map-row">
+        <div class="idx">04</div>
+        <div class="paper"><span class="mono">The paper</span>A cache that keeps evidence, not frames.</div>
+        <p><b>Systems runtime.</b> Memory that grows with facts instead of rollout length, tiered across GPU, RAM, and NVMe. The paper calls this <i>"the one item a reader with a systems background is best placed to solve."</i> That's our team.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio mono"><span>Boulder Research · Confidential draft</span><span>4</span></div>
+</section>
+
+<!-- ============ PAGE 4: PRODUCT + EFFICIENCY ============ -->
+<section class="page">
+  <div class="runner mono"><span>Boulder Research</span><span>04 · Product &amp; platform</span></div>
+
+  <div class="sec">
+    <div class="sec-n mono">05 / First product</div>
+    <h2>Break games <span class="serif">before players do.</span></h2>
+    <div class="two">
+      <div>
+        <p><b>The customer.</b> Independent and mid-sized studios on Godot, the fastest-growing open-source engine. Capital is arriving (W4 Games raised an $18M Series B and signed with Tencent), but testing tools haven't kept up.</p>
+        <p><b>The job.</b> Hand us a build. Autonomous agents explore it and return reproducible failures (crashes, stuck states, regressions), each with the action trace, state snapshot, and video.</p>
+        <p><b>Why it compounds.</b> Every run generates action-labelled, failure-labelled trajectories, the scarcest data in the field. The largest public robot corpora are around 500 hours. We generate ours by running games.</p>
+      </div>
+      <div>
+        <table>
+          <tr><th>Path</th><th>When</th><th>Revenue</th></tr>
+          <tr><td><b>Managed testing</b><br>We run it, you get reports</td><td class="num">Now</td><td>Paid pilots, retainers</td></tr>
+          <tr><td><b>Godot plugin + CI</b><br>Self-serve testing</td><td class="num">Next</td><td>Subscriptions, compute</td></tr>
+          <tr><td><b>World-model API</b><br>Rollout &amp; state prediction</td><td class="num">Later</td><td>Usage, adapters</td></tr>
+          <tr><td><b>Custom systems</b><br>Robotics, IoT, digital twins</td><td class="num">Explore</td><td>Engagements, licensing</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-n mono">06 / Leaving the datacenter behind</div>
+    <h2>If it runs on a desk,<br><span class="serif">it runs anywhere.</span></h2>
+    <p>Rather than fund a pretraining run (published benchmarks cite more than 4,160 H200 GPU-days), we adapt open checkpoints and spend our effort where the paper's arithmetic says the cost lives. Its sensitivity analysis ranks the knobs: <b>patch size</b> (quadratic), then <b>resolution</b>, then <b>frame rate</b>, then <b>rollout length</b>. We turn them in that order and add the engine as the source of truth.</p>
+    <svg viewBox="0 0 700 112" width="100%" aria-label="Deployment tiers">
+      <g font-size="10" fill="#75736d" letter-spacing="1">
+        <text x="0" y="12">TIER</text><text x="110" y="12">HARDWARE</text><text x="440" y="12">MEMORY (RELATIVE, LOG)</text>
+      </g>
+      <line x1="0" y1="20" x2="700" y2="20" stroke="#0b0b0c" stroke-width="1.5"/>
+      <g font-size="11" fill="#0b0b0c">
+        <text x="0" y="44" fill="#2b4bff" font-weight="600">0 · LOCAL</text><text x="110" y="44">One 16 GB GPU · 1.3B model · 480p / 20 FPS target</text>
+        <rect x="440" y="36" width="60" height="8" fill="#2b4bff"/>
+        <text x="0" y="74" font-weight="600">1 · CLUSTER</text><text x="110" y="74">112 GB aggregate · longer horizons</text>
+        <rect x="440" y="66" width="140" height="8" fill="#0b0b0c"/>
+        <text x="0" y="104" font-weight="600">2 · CLOUD</text><text x="110" y="104">H100 / H200 / GB200 · on customer demand</text>
+        <rect x="440" y="96" width="260" height="8" fill="#0b0b0c" opacity=".35"/>
+      </g>
+    </svg>
+    <p class="cap mono" style="margin-top:6px">Tier 0 is the design target and first milestone. Tiers 1–2 are scale-out paths, not dependencies.</p>
+    <div class="three" style="margin-top:6px">
+      <div><h3>Adapters</h3><p>An 84 MB task adapter on a 2.6 GB base: one model, many environments, no duplicated weights.</p></div>
+      <div><h3>Cache tiers</h3><p>KV state streamed across GPU, host RAM, and NVMe, then recalled before it's needed, with periodic re-anchoring.</p></div>
+      <div><h3>Kernels</h3><p>Custom kernels and engine integration. Our team has shipped models onto hardware vendors said couldn't run them.</p></div>
+    </div>
+  </div>
+
+  <div class="folio mono"><span>Boulder Research · Confidential draft</span><span>5</span></div>
+</section>
+
+<!-- ============ PAGE 5: USE OF FUNDS + MILESTONES ============ -->
+<section class="page">
+  <div class="runner mono"><span>Boulder Research</span><span>05 · The round</span></div>
+
+  <div class="sec">
+    <div class="sec-n mono">07 / Use of funds <span class="draft">· proposed allocation</span></div>
+    <h2>$500K. <span class="serif">Mostly people and GPUs we own.</span></h2>
+    <div class="fund-bar">
+      <i style="width:60%;background:#0b0b0c"></i>
+      <i style="width:18%;background:#2b4bff"></i>
+      <i style="width:7%;background:#5a5a5e"></i>
+      <i style="width:7%;background:#8fa3ff"></i>
+      <i style="width:4%;background:#b3b0a8"></i>
+      <i style="width:4%;background:#d6d3cb;border-right:0"></i>
+    </div>
+    <table>
+      <tr><th>Category</th><th>Amount</th><th>Share</th><th>What it buys</th></tr>
+      <tr><td><span class="legend-row"><span class="sw" style="background:#0b0b0c"></span><b>Engineering team</b></span></td><td class="num">$300,000</td><td class="num">60%</td><td>Two founders full-time for 18 months, plus a part-time systems contractor</td></tr>
+      <tr><td><span class="legend-row"><span class="sw" style="background:#2b4bff"></span><b>Compute</b></span></td><td class="num">$90,000</td><td class="num">18%</td><td>Owned Tier 0/1 GPUs, plus cloud bursts for adaptation and evaluation</td></tr>
+      <tr><td><span class="legend-row"><span class="sw" style="background:#5a5a5e"></span><b>Data &amp; benchmarks</b></span></td><td class="num">$35,000</td><td class="num">7%</td><td>Trajectory storage, test-game corpus, decision-level benchmark</td></tr>
+      <tr><td><span class="legend-row"><span class="sw" style="background:#8fa3ff"></span><b>Design partners &amp; GTM</b></span></td><td class="num">$35,000</td><td class="num">7%</td><td>Pilot support, Godot community presence, events</td></tr>
+      <tr><td><span class="legend-row"><span class="sw" style="background:#b3b0a8"></span><b>Company &amp; IP</b></span></td><td class="num">$20,000</td><td class="num">4%</td><td>Delaware incorporation, IP assignment, contracts</td></tr>
+      <tr><td><span class="legend-row"><span class="sw" style="background:#d6d3cb"></span><b>Reserve</b></span></td><td class="num">$20,000</td><td class="num">4%</td><td>Contingency</td></tr>
+    </table>
+  </div>
+
+  <div class="sec">
+    <div class="sec-n mono">08 / Milestones</div>
+    <h2>What $500K <span class="serif">proves.</span></h2>
+    <div class="timeline">
+      <div class="tl"><div class="when">Months 0–3</div><div><h3>Prove the loop</h3><ul><li>Incorporate, assign IP, close the round</li><li>Godot integration with save-state replay: counterfactual rollouts on demand</li><li>First Tier 0 rollout benchmark: memory, latency, and drift on one 16 GB GPU</li></ul></div></div>
+      <div class="tl"><div class="when">Months 3–6</div><div><h3>Prove it finds things</h3><ul><li>Evidence-cache prototype: memory grows with facts, not frames</li><li>Decision-level benchmark v0: levels completed and bugs found per GPU-hour</li><li>Three Godot design partners signed</li></ul></div></div>
+      <div class="tl"><div class="when">Months 6–12</div><div><h3>Prove customer value</h3><ul><li>Paid pilots on external builds with reproducible failure reports</li><li>Measured comparison against scripted and manual testing on cost and coverage</li><li>Interactive Tier 0 target (480p / 20 FPS) measured and published</li></ul></div></div>
+      <div class="tl"><div class="when">Months 12–18</div><div><h3>Prove it's a company</h3><ul><li>CI integration and self-serve testing workflow</li><li>Publish the paper and open the decision benchmark</li><li>Seed-ready: paid pilots, unit economics, and a second environment beyond games</li></ul></div></div>
+    </div>
+  </div>
+
+  <div class="folio mono"><span>Boulder Research · Confidential draft</span><span>6</span></div>
+</section>
+
+<!-- ============ PAGE 6: TEAM + CLAIMS + CLOSE ============ -->
+<section class="page">
+  <div class="runner mono"><span>Boulder Research</span><span>06 · Team &amp; evidence</span></div>
+
+  <div class="sec">
+    <div class="sec-n mono">09 / Team</div>
+    <h2>Built by people who <span class="serif">make models fit.</span></h2>
+    <div class="two">
+      <div class="person">
+        <h3>Adhitya Mohan</h3>
+        <div class="role">ML systems &amp; robotics</div>
+        <ul>
+          <li>Reverse-engineered the Rockchip RK3588 NPU to deploy a vision-language model the vendor toolchain couldn't compile (SHARD, EuroMLSys '26), and built an open compiler and runtime for it.</li>
+          <li>Ported all 130 LIBERO manipulation tasks to MuJoCo Warp: thousands of parallel robot environments on one $700 GPU.</li>
+          <li>Sim-to-real RL at AMD Research &amp; Advanced Development, with upstream ROCm and PyTorch fixes. MS CS, CU Boulder (BASIL lab).</li>
+        </ul>
+      </div>
+      <div class="person">
+        <h3>Chris Kellogg</h3>
+        <div class="role">AI product &amp; infrastructure</div>
+        <ul>
+          <li>AI-native full-stack architect who takes concepts to running, cloud-hosted systems without handoffs.</li>
+          <li>Built and runs Miniloader, a local-AI platform for running agents and models on your own hardware.</li>
+          <li>Track record across media, sports tech, law, and real estate, including large-scale data and AI analysis systems for entertainment clients.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-n mono">10 / Evidence and honesty</div>
+    <h2>What exists, <span class="serif">and what we'll prove.</span></h2>
+    <div class="claims">
+      <div>
+        <span class="tag blue">Exists today</span>
+        <ul>
+          <li>Agents completing a full Super Mario World level (video available)</li>
+          <li>Godot integration work and GPU kernel experiments</li>
+          <li>A working paper on world-model foundations, costs, and open problems</li>
+          <li>Team experience shipping models onto constrained and heterogeneous hardware</li>
+        </ul>
+      </div>
+      <div>
+        <span class="tag" style="color:var(--fault)">This round proves</span>
+        <ul>
+          <li>That the system finds commercially meaningful bugs</li>
+          <li>That studios pay for the workflow</li>
+          <li>That Godot-specific integration materially improves cost or capability</li>
+          <li>That interactive rollouts meet the Tier 0 target on a 16 GB GPU</li>
+        </ul>
+      </div>
+    </div>
+    <p style="margin-top:12px;font-size:12.5px">Hardware and performance figures in this brief are targets or published third-party numbers unless stated otherwise. We'll report measured results as we produce them: bugs found, coverage, runtime, memory, hardware cost, and reproducibility.</p>
+  </div>
+
+  <div class="closing">
+    <div class="mono" style="color:rgba(239,237,231,.5);margin-bottom:10px">11 / The ask</div>
+    <h2>$500K to build AI that understands our world, <span class="serif">without the datacenter.</span></h2>
+    <p>We're looking for investors who want the full paper and the demo videos, and for Godot studios who want to be design partners. chris@kellogg.io</p>
+  </div>
+
+  <div class="folio mono"><span>Boulder Research · Confidential draft</span><span>7</span></div>
+</section>
+</body>
+</html>

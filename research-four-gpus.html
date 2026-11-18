@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What four consumer GPUs actually deliver — Boulder Research</title>
+  <meta name="description" content="Four Radeon AI PRO R9700 cards, measured layer by layer: why the PCIe topology, not the links or the collective settings, sets the ceiling, and what that means for data-parallel training." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="projects.css" />
+  <link rel="stylesheet" href="research.css" />
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+    <nav class="nav">
+    <a href="index.html" class="brand" aria-label="Boulder Research home"></a>
+    <div class="nav-links mono">
+      <a href="index.html" class="hide-sm">Home</a>
+      <div class="nav-drop">
+        <a href="projects.html">Projects</a>
+        <button type="button" class="nav-drop-toggle" aria-expanded="false" aria-label="Show the Projects menu">▾</button>
+        <div class="nav-drop-menu">
+          <a href="project-warp-core.html">Warp Core</a>
+          <a href="project-miniloader.html">Miniloader</a>
+          <a href="project-astrolabe.html">Astrolabe</a>
+          <a href="research.html" aria-current="page">Research</a>
+        </div>
+      </div>
+      <a href="investors.html" class="hide-sm">Investors</a>
+      <a href="about.html" class="hide-sm">About</a>
+      <a class="btn" href="mailto:chris@kellogg.io?subject=Research">Get in touch</a>
+  </nav>
+  <script>
+  // T-439: a touchscreen has no hover, so the caret is a real button that
+  // pins the dropdown open on tap (the CSS reads .is-open). Hover still
+  // opens it for a mouse pointer.
+  (function () {
+    const drop = document.querySelector(".nav-drop");
+    const caret = drop && drop.querySelector(".nav-drop-toggle");
+    if (!caret) return;
+    caret.addEventListener("click", () => {
+      const open = drop.classList.toggle("is-open");
+      caret.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  })();
+  </script>
+
+  <header class="article-head">
+    <div class="wrap">
+      <div class="crumbs mono"><a href="index.html">Boulder Research</a> / <a href="research.html">Research</a> / Hardware</div>
+      <h1>Four GPUs, measured.<br><span class="serif">The topology is the ceiling.</span></h1>
+      <p class="dek">Four consumer RDNA4 cards, measured from firmware up to training throughput. The links are fast, the settings barely matter, and two PCIe switches decide almost everything.</p>
+      <div class="byline mono">
+        <span><b>Adhitya Mohan</b></span>
+        <time datetime="2026-11-10">10 November 2026</time>
+        <span>Hardware</span>
+        <span>~8 min read</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="article-body">
+      <aside class="toc mono" aria-label="Contents">
+        <span>Contents</span>
+        <ol>
+          <li><a href="#machine">The machine</a></li>
+          <li><a href="#chain">The prerequisite chain</a></li>
+          <li><a href="#ceiling">The ring ceiling</a></li>
+          <li><a href="#sweep">Settings are not the lever</a></li>
+          <li><a href="#precision">FP8 and attention</a></li>
+          <li><a href="#scaling">What four cards deliver</a></li>
+          <li><a href="#stack">The stack matters more</a></li>
+        </ol>
+      </aside>
+
+      <article class="prose">
+        <p>The headline number for this machine is easy to state: <b>5,052,188 world-steps per second at 4,096 parallel game worlds</b>. The harder question is what the machine can do for the other half of the job, training models on what those worlds produce. That question is answered by the interconnect, and the interconnect is answered by working up from the firmware.</p>
+
+        <h2 id="machine">The machine</h2>
+        <p>Four Radeon AI PRO R9700 cards, 32 GB each, on a Linux kernel built with peer-to-peer support, running ROCm 10.1. Every figure below was measured on it.</p>
+        <p>We report peak numbers, but each one comes with the condition behind it. FP8 matrix multiply reaches 239.05 TFLOP/s against 124.84 for bf16. Flash attention reaches 175.38 TFLOP/s. All-reduce reaches 20.6 GB/s against a 41.1 GB/s ceiling. The last number is the one that matters most, and the rest of this piece explains it.</p>
+
+        <h2 id="chain">The prerequisite chain</h2>
+        <p>Peer-to-peer transfer between cards depends on a firmware setting before it depends on any software. The vendor's setup guide states that with Resize BAR disabled, peer-to-peer is turned off. On this machine the resize attribute is non-zero on all four cards and the first memory region maps the full 32 GB, so the setting is on. Above it sit the kernel options for peer-to-peer and peer DMA, both present, and then the collective library, which reports peer-to-peer on all twelve ordered pairs.</p>
+        <div class="callout"><span class="mono">Why the order matters</span>A card with the firmware setting off still trains on one GPU. For every collective it silently falls back to copying through host memory, which looks exactly like a slow interconnect. You'd tune the wrong layer.</div>
+        <figure class="table">
+          <table>
+            <thead><tr><th>Layer</th><th>Measured</th><th>What it permits</th></tr></thead>
+            <tbody>
+              <tr><td>firmware</td><td class="n">32 GB region</td><td>peer-to-peer available at all</td></tr>
+              <tr><td>kernel</td><td class="n">both options on</td><td>peer DMA rather than host staging</td></tr>
+              <tr><td>links</td><td class="n">32 GT/s ×16</td><td>27.40 GB/s per pair</td></tr>
+              <tr><td>topology</td><td class="n">2 switches, 2 hops</td><td>41.1 GB/s ring ceiling</td></tr>
+              <tr><td>collective</td><td class="n">20.59 GB/s</td><td>about 50% of the ceiling</td></tr>
+            </tbody>
+          </table>
+          <figcaption>Each layer bounds the one above it.</figcaption>
+        </figure>
+
+        <h2 id="ceiling">The ring ceiling</h2>
+        <p>The links aren't the constraint. All four cards report a PCIe 5.0 ×16 link, and a raw peer copy runs at a uniform 27.40 GB/s on every ordered pair.</p>
+        <p>The topology is. Two PCIe switches carry two cards each. Every pair reports two hops, so traffic between switches crosses the CPU's root complex, and each switch's upstream link is shared by two cards.</p>
+        <p>A ring all-reduce over <i>n</i> ranks moves 2(<i>n</i> − 1)/<i>n</i> times the message across the fabric, so its bus bandwidth ceiling is that factor times the per-link rate:</p>
+        <span class="eq">2 × 3 / 4 = 1.5   →   1.5 × 27.40 GB/s = 41.1 GB/s</span>
+        <p>Measured all-reduce reaches 20.59 GB/s, or 50% of that ceiling.</p>
+
+        <h2 id="sweep">Settings are not the lever</h2>
+        <p>The natural response to 50% is to tune the collective library. We swept twelve configurations. The best moved the number by 1.6%.</p>
+        <figure class="table">
+          <table>
+            <thead><tr><th>Configuration</th><th>Bus GB/s</th><th>What it rules out</th></tr></thead>
+            <tbody>
+              <tr><td>untuned</td><td class="n">20.26</td><td>the baseline</td></tr>
+              <tr><td>ring algorithm</td><td class="n">20.23</td><td>algorithm choice</td></tr>
+              <tr><td>tree algorithm</td><td class="n">15.28</td><td>tree is 25% worse</td></tr>
+              <tr><td>low-latency protocol</td><td class="n">20.23</td><td>protocol choice</td></tr>
+              <tr><td>sixteen channels</td><td class="n">20.53</td><td>channel count</td></tr>
+              <tr><td>ring, low-latency, 16 channels, one queue</td><td class="n">20.59</td><td>the best combination</td></tr>
+            </tbody>
+          </table>
+          <figcaption>The last column is what each run rules out, which is why the sweep is worth running.</figcaption>
+        </figure>
+
+        <h2 id="precision">FP8 and attention</h2>
+        <p>FP8 works on this hardware. On a 4,096³ matrix multiply it's 1.91× bf16. The claim that it doesn't work, which appears in two library issue trackers, is about those libraries' architecture tables, not about the card.</p>
+        <p>The check is arithmetic. A 4,096³ multiply is 2 × 4,096³ ≈ 1.374 × 10¹¹ operations. At 124.84 TFLOP/s that's 1.10 ms, which matches the measured 1.101 ms. At 239.05 TFLOP/s it's 0.575 ms.</p>
+        <p>Shape matters. At 1,024³, FP8 gives no benefit at all, because that size is limited by kernel launch, not compute. At 8,192³ the ratio is 2.16, above the hardware's 2× dense rate, which means bf16 is underperforming there rather than FP8 beating its peak.</p>
+        <p>Flash attention runs through the composable-kernel path at 175.38 TFLOP/s for a 4,096-token sequence, 33.5× the fallback (1.567 ms against 52.507 ms). The guards that gate this path list the datacenter parts, not because the consumer part can't run the kernel, but because the datacenter path behaves differently.</p>
+
+        <h2 id="scaling">What four cards deliver</h2>
+        <p>Take flash attention as the workload and a 151-million-parameter model, so the bf16 gradient is 302 MB, with one all-reduce per step. <b>Four cards are slower than one.</b> The all-reduce takes 22.79 ms and the compute takes 4.4 ms, so the step is almost all communication and the scaling is 0.19.</p>
+        <p>That number is predictable from first principles:</p>
+        <span class="eq">1.5 × 3.02×10⁸ B / 20.6×10⁹ B/s ≈ 0.022 s  (measured: 22.79 ms)</span>
+        <p>Gradient accumulation fixes the ratio, because compute scales with the number of micro-batches and the collective doesn't:</p>
+        <figure class="table">
+          <table>
+            <thead><tr><th>Micro-batches per collective</th><th>One card</th><th>Four cards</th><th>Scaling</th><th>Collective share</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td class="n">161.89</td><td class="n">121.14</td><td class="n">0.19</td><td>83.7%</td></tr>
+              <tr><td>4</td><td class="n">172.30</td><td class="n">315.64</td><td class="n">0.46</td><td>54.4%</td></tr>
+              <tr><td>16</td><td class="n">171.21</td><td class="n">527.39</td><td class="n">0.77</td><td>22.7%</td></tr>
+            </tbody>
+          </table>
+          <figcaption>4,096-token sequence. The single-card column is flat, which is the control: accumulation changes the communication ratio, not the kernel.</figcaption>
+        </figure>
+        <p>A two-parameter model explains the column. With <i>A</i> micro-batches, compute <i>k</i> per micro-batch and collective time <i>c</i>, the collective share is <i>c</i> / (<i>A·k</i> + <i>c</i>). At <i>A</i> = 1 the measured 83.7% gives <i>c</i> = 5.14<i>k</i>. That predicts 24.3% at <i>A</i> = 16; the measurement is 22.7%, within 1.6 points.</p>
+        <p>A larger model doesn't help, because it raises compute and gradient together. At a model width of 4,096 the gradient is 4.8 GB and the collective takes 361 ms, which swamps any attention compute at these sequence lengths. At 7 billion parameters the gradient is 14 GB and one collective costs about a second.</p>
+        <p>The conclusion: on this box, data parallelism needs about sixteen micro-batches per collective to reach 0.77 scaling, and below that it's a loss. No collective setting changes that. A different topology would.</p>
+
+        <h2 id="stack">The stack matters more than the flags</h2>
+        <p>One last trap. The machine's system Python carries a PyTorch built against one ROCm version while the installed toolkit is another. The matching stack is a container image with PyTorch 2.13 built against ROCm 10.1. Measuring on the system interpreter gives numbers that look plausible and belong to a different software stack.</p>
+
+        <p class="source">Adapted from <i>Running a Game Engine as Warp Kernels</i> (A. Mohan, draft report), section 7 and appendix A. Rendering cost is not measured in that report.</p>
+
+        <div class="article-foot mono">
+          <a href="research-two-audits.html">← Previous: Two audits</a>
+          <a href="research-gap-or-wall.html">Next: A gap or a wall →</a>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <section class="cta slim">
+    <div class="wrap">
+      <footer class="mono">
+        <span>© 2026 Boulder Research</span>
+        <a href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+        <span class="portfolio-links">Portfolio: <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person</a> · <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware</a></span>
+        <span>Intelligence for interactive worlds</span>
+      </footer>
+    </div>
+  </section>
+</body>
+</html>

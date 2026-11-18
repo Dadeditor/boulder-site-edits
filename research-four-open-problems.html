@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Four open problems. A desk-sized target. — Boulder Research</title>
+  <meta name="description" content="The four open problems in world models that more compute doesn't solve (hybrid state, counterfactual data, decision-level metrics, an evidence cache) and the design target of one 16 GB GPU." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="projects.css" />
+  <link rel="stylesheet" href="research.css" />
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+    <nav class="nav">
+    <a href="index.html" class="brand" aria-label="Boulder Research home"></a>
+    <div class="nav-links mono">
+      <a href="index.html" class="hide-sm">Home</a>
+      <div class="nav-drop">
+        <a href="projects.html">Projects</a>
+        <button type="button" class="nav-drop-toggle" aria-expanded="false" aria-label="Show the Projects menu">▾</button>
+        <div class="nav-drop-menu">
+          <a href="project-warp-core.html">Warp Core</a>
+          <a href="project-miniloader.html">Miniloader</a>
+          <a href="project-astrolabe.html">Astrolabe</a>
+          <a href="research.html" aria-current="page">Research</a>
+        </div>
+      </div>
+      <a href="investors.html" class="hide-sm">Investors</a>
+      <a href="about.html" class="hide-sm">About</a>
+      <a class="btn" href="mailto:chris@kellogg.io?subject=Research">Get in touch</a>
+  </nav>
+  <script>
+  // T-439: a touchscreen has no hover, so the caret is a real button that
+  // pins the dropdown open on tap (the CSS reads .is-open). Hover still
+  // opens it for a mouse pointer.
+  (function () {
+    const drop = document.querySelector(".nav-drop");
+    const caret = drop && drop.querySelector(".nav-drop-toggle");
+    if (!caret) return;
+    caret.addEventListener("click", () => {
+      const open = drop.classList.toggle("is-open");
+      caret.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  })();
+  </script>
+
+  <header class="article-head">
+    <div class="wrap">
+      <div class="crumbs mono"><a href="index.html">Boulder Research</a> / <a href="research.html">Research</a> / World models</div>
+      <h1>Four open problems.<br><span class="serif">A desk-sized target.</span></h1>
+      <p class="dek">None of the problems that would change what world models can do is a matter of more compute. Each is a question of representation, data, measurement or memory, and each points at a design that could run on one GPU.</p>
+      <div class="byline mono">
+        <span><b>Boulder Research</b></span>
+        <time datetime="2026-11-10">10 November 2026</time>
+        <span>World models</span>
+        <span>~7 min read</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="article-body">
+      <aside class="toc mono" aria-label="Contents">
+        <span>Contents</span>
+        <ol>
+          <li><a href="#state">A state that can be read and drawn</a></li>
+          <li><a href="#counterfactual">Counterfactual data</a></li>
+          <li><a href="#metric">A metric that tracks decisions</a></li>
+          <li><a href="#cache">A cache that keeps evidence</a></li>
+          <li><a href="#knobs">Turning the knobs in order</a></li>
+          <li><a href="#target">The desk-sized target</a></li>
+        </ol>
+      </aside>
+
+      <article class="prose">
+        <p>The <a href="research-frame-is-not-a-token.html">previous piece</a> argued that the cost of a world model comes from what it holds while it predicts, and that its errors come from what it is trained against. Our working paper ends by naming four open problems that follow from that. We take them in turn, then describe the hardware target they point to.</p>
+        <div class="callout"><span class="mono">Status</span>This piece describes research directions and design targets. Where it gives a hardware or model size, that is a target we are building toward, not a measurement. Our measured results are in the <a href="research.html#simulation">simulation</a> and <a href="research.html#hardware">hardware</a> articles.</div>
+
+        <h2 id="state">A state that can be both read and drawn</h2>
+        <p>A pure video model keeps its knowledge of the world implicitly, in pixels and activations. You can't ask it where the ball is. You can only look at the picture and guess, and so can the next frame.</p>
+        <p>A game engine is the opposite: explicit, readable state (positions, rules, inventory) and no imagination at all. The hybrid answer is to use both. The engine holds the state that has to be right. The learned model handles appearance and fast imagination, and is periodically <b>re-anchored</b> to the engine so its drift can't compound.</p>
+        <p>That needs an engine whose state you can read, copy and step cheaply, many times over. That is what our Warp Core work provides: <a href="research-engine-is-the-window.html">a game's rules running as GPU kernels</a>, thousands of readable copies at once.</p>
+
+        <h2 id="counterfactual">Counterfactual data with a measured gap</h2>
+        <p>Planning needs to know what would have happened under a different action. Recorded data can't tell you: the real world can't be reset to try again, so every recording shows one action and one outcome.</p>
+        <p>Games can be reset. A save state gives unlimited "what if I'd done X instead" trajectories from exactly the same starting point. That's the data planning needs and recording can't provide. The open question is the gap between game counterfactuals and real ones, and that gap has to be measured rather than assumed away.</p>
+
+        <h2 id="metric">A metric that tracks decisions, not frames</h2>
+        <p>Frame metrics score how close a prediction looks to a recording. As the previous piece showed, that rewards plausible blur over correct physics.</p>
+        <p>A decision-level metric asks whether the model let an agent do the job: did it complete the level, find the crash, reproduce the stuck state? In a game, the engine scores that, not a human looking at frames. It's also the metric a customer cares about, which is why we chose automated game testing as the first application.</p>
+
+        <h2 id="cache">A cache that keeps evidence, not frames</h2>
+        <p>The key-value cache grows with rollout length. A runtime that keeps <b>facts</b> instead, and grows with the number of things that are true about the world rather than the number of frames seen, would change the memory arithmetic entirely.</p>
+        <p>The systems version of that is a cache tiered across GPU memory, host RAM and NVMe, streamed back before it's needed, and periodically re-anchored to real state. The paper calls this "the one item a reader with a systems background is best placed to solve". It's the problem our team is built around.</p>
+
+        <h2 id="knobs">Turning the knobs in order</h2>
+        <p>We don't plan to pretrain a model. Published benchmarks put pretraining at more than 4,160 H200 GPU-days. We adapt open checkpoints and spend effort where the paper's arithmetic says the cost lives.</p>
+        <p>The paper's sensitivity analysis ranks the knobs by how much they move the cost:</p>
+        <ol>
+          <li><b>Patch size</b>, which enters quadratically.</li>
+          <li><b>Resolution.</b></li>
+          <li><b>Frame rate.</b></li>
+          <li><b>Rollout length.</b></li>
+        </ol>
+        <p>We turn them in that order, and add the engine as the source of truth so that turning them doesn't cost correctness.</p>
+
+        <h2 id="target">The desk-sized target</h2>
+        <p>The design target, and our first milestone, is one 16 GB GPU running a 1.3B-parameter model at 480p and 20 frames per second. Larger clusters and datacenter cards are scale-out paths, not dependencies.</p>
+        <figure class="table">
+          <table>
+            <thead><tr><th>Piece</th><th>Target</th><th>Why it helps</th></tr></thead>
+            <tbody>
+              <tr><td>Local tier</td><td class="n">1 × 16 GB GPU</td><td>1.3B model, 480p at 20 FPS; the first milestone</td></tr>
+              <tr><td>Adapters</td><td class="n">84 MB on 2.6 GB</td><td>one base model serves many environments without duplicated weights</td></tr>
+              <tr><td>Cache tiers</td><td class="n">GPU · RAM · NVMe</td><td>state streamed out and recalled before it's needed</td></tr>
+              <tr><td>Re-anchoring</td><td class="n">periodic</td><td>the engine corrects drift before it compounds</td></tr>
+            </tbody>
+          </table>
+          <figcaption>Design targets from our working paper. The adapter sizes are an example configuration. None of these rows is a measured result yet.</figcaption>
+        </figure>
+        <blockquote>If it runs on a desk, it runs anywhere.</blockquote>
+        <p>A system that works on one consumer card works on-prem, at the edge and in the cloud. One that only works in a datacenter only works there. The first half of that target, cheap and checkable copies of a world, is what <a href="research-engine-is-the-window.html">the next piece</a> describes.</p>
+
+        <p class="source">Adapted from our technical brief and working paper on world-model foundations, costs and open problems. The pretraining figure is as published by its authors.</p>
+
+        <div class="article-foot mono">
+          <a href="research-frame-is-not-a-token.html">← Previous: A frame is not a token</a>
+          <a href="research-engine-is-the-window.html">Next: The engine is the window →</a>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <section class="cta slim">
+    <div class="wrap">
+      <footer class="mono">
+        <span>© 2026 Boulder Research</span>
+        <a href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+        <span class="portfolio-links">Portfolio: <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person</a> · <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware</a></span>
+        <span>Intelligence for interactive worlds</span>
+      </footer>
+    </div>
+  </section>
+</body>
+</html>

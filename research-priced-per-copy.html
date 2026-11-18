@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulation is priced per copy. — Boulder Research</title>
+  <meta name="description" content="Running a world many times usually means running the engine many times. What changes when the unit of cost is the state instead, and why nothing at the core of Warp Core is specific to Godot." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="projects.css" />
+  <link rel="stylesheet" href="research.css" />
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+    <nav class="nav">
+    <a href="index.html" class="brand" aria-label="Boulder Research home"></a>
+    <div class="nav-links mono">
+      <a href="index.html" class="hide-sm">Home</a>
+      <div class="nav-drop">
+        <a href="projects.html">Projects</a>
+        <button type="button" class="nav-drop-toggle" aria-expanded="false" aria-label="Show the Projects menu">▾</button>
+        <div class="nav-drop-menu">
+          <a href="project-warp-core.html">Warp Core</a>
+          <a href="project-miniloader.html">Miniloader</a>
+          <a href="project-astrolabe.html">Astrolabe</a>
+          <a href="research.html" aria-current="page">Research</a>
+        </div>
+      </div>
+      <a href="investors.html" class="hide-sm">Investors</a>
+      <a href="about.html" class="hide-sm">About</a>
+      <a class="btn" href="mailto:chris@kellogg.io?subject=Research">Get in touch</a>
+  </nav>
+  <script>
+  // T-439: a touchscreen has no hover, so the caret is a real button that
+  // pins the dropdown open on tap (the CSS reads .is-open). Hover still
+  // opens it for a mouse pointer.
+  (function () {
+    const drop = document.querySelector(".nav-drop");
+    const caret = drop && drop.querySelector(".nav-drop-toggle");
+    if (!caret) return;
+    caret.addEventListener("click", () => {
+      const open = drop.classList.toggle("is-open");
+      caret.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  })();
+  </script>
+
+  <header class="article-head">
+    <div class="wrap">
+      <div class="crumbs mono"><a href="index.html">Boulder Research</a> / <a href="research.html">Research</a> / Simulation architecture</div>
+      <h1>Simulation is priced per copy.<br><span class="serif">Change the unit.</span></h1>
+      <p class="dek">Running a world a thousand times usually means running an engine a thousand times. When the unit of cost becomes the state that changes, three kinds of work get cheaper, and the engine stops being the thing that matters.</p>
+      <div class="byline mono">
+        <span><b>Boulder Research</b></span>
+        <time datetime="2026-11-10">10 November 2026</time>
+        <span>Simulation architecture</span>
+        <span>~6 min read</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="article-body">
+      <aside class="toc mono" aria-label="Contents">
+        <span>Contents</span>
+        <ol>
+          <li><a href="#unit">The unit of cost</a></li>
+          <li><a href="#search">Search at scale</a></li>
+          <li><a href="#diagnosis">Faults with a diagnosis</a></li>
+          <li><a href="#truth">Ground truth for learned models</a></li>
+          <li><a href="#general">Nothing here is specific to Godot</a></li>
+          <li><a href="#compounds">What compounds</a></li>
+        </ol>
+      </aside>
+
+      <article class="prose">
+        <p>The other essays in this series are about whether the architecture works: <a href="research-engine-as-kernels.html">where the split goes</a>, <a href="research-rules-and-faults.html">how we check it</a>, <a href="research-four-gpus.html">what the hardware gives</a>, <a href="research-gap-or-wall.html">what's still missing</a>. This one is about why it's worth building.</p>
+
+        <h2 id="unit">The unit of cost</h2>
+        <p>Today, a thousand copies of a world means a thousand engine instances, each with its full memory footprint and its own CPU time. The cost scales with the engine, and most of the engine is the same in every copy.</p>
+        <p>In Warp Core the cost scales with what changes. The immutable tier (meshes, textures, level geometry) is stored once. Each extra world adds its mutable state, about 10 KB in the current layout, so 4,096 worlds fit in about 41 MB. The <a href="research-engine-as-kernels.html#tiers">arithmetic is in the first essay</a>.</p>
+        <blockquote>A world model learns from the worlds you can afford to run. The point is to make running them cheap.</blockquote>
+        <p>Three things follow from changing the unit.</p>
+
+        <h2 id="search">Search at scale</h2>
+        <p>Thousands of worlds can branch from the same saved state and try different actions. That's the exploration that reinforcement learning, Go-Explore-style search and automated game testing all depend on, and it's the source of the counterfactual data described in <a href="research-four-open-problems.html#counterfactual">Four open problems</a>. Lane independence is already checked: each of 4,096 lanes matches a single-lane run over 8 ticks.</p>
+
+        <h2 id="diagnosis">Faults with a diagnosis</h2>
+        <p>Because the causal graph is derived from the rules, a world that goes wrong comes with a trace back to the field where it started. In testing terms, a failure arrives with its cause rather than as a video someone has to watch. The <a href="research-rules-and-faults.html#gates">ten mutation gates</a> are the evidence that the trace points to the right place.</p>
+
+        <h2 id="truth">Ground truth for learned models</h2>
+        <p>Every world produces exact, labelled state at every step. That's training data for world models, and it's also an oracle to check their predictions against, so they can be re-anchored before they drift into plausible fiction. This is the "state that can be read and drawn" from <a href="research-four-open-problems.html#state">the open problems</a>, supplied by an engine rather than inferred from pixels.</p>
+
+        <h2 id="general">Nothing here is specific to Godot</h2>
+        <p>A game engine is a world simulator with a renderer. Godot happens to be open source, modifiable at any depth and free to deploy, which is why we started there, and why teams outside games already use it for interactive 3D simulation.</p>
+        <p>But the core pieces describe any world that steps forward in time:</p>
+        <ul>
+          <li><b>the state contract</b>, which fixes what a world is in memory;</li>
+          <li><b>the rule language</b>, which declares each rule once;</li>
+          <li><b>the compiler</b>, which lowers rules to parallel GPU lanes and to reference backends;</li>
+          <li><b>the parity gates</b>, which check the lanes against the source;</li>
+          <li><b>the causal graph</b>, which traces a fault to where it started.</li>
+        </ul>
+        <p>Adding another source (another engine, a robotics simulator such as MuJoCo, an industrial process model) means adding a front end that reads its logic and an oracle that checks against it. The verified core in the middle stays the same.</p>
+        <div class="callout"><span class="mono">Status</span>Godot is the only source built today. Every other source in this section is an expansion path, and none has been attempted.</div>
+
+        <h2 id="compounds">What compounds</h2>
+        <p>If the core holds, three things get cheaper over time rather than more expensive:</p>
+        <ul>
+          <li><b>Each source is cheaper than the last.</b> The core and its gates are reused; a new source adds a front end and an oracle, not a new system.</li>
+          <li><b>Translation improves with use.</b> If script translation works as planned (see <a href="research-gap-or-wall.html#translate">Translate, don't port</a>), every verified translation becomes an example for the next.</li>
+          <li><b>The data accumulates.</b> Exact action, state and failure trajectories are scarce. Every world run produces more of them.</li>
+        </ul>
+        <blockquote>Start with games, because they reset. End with any world that steps forward in time.</blockquote>
+
+        <p class="source">Adapted from our Warp Core technical brief and <i>Running a Game Engine as Warp Kernels</i> (A. Mohan, draft report). See the <a href="project-warp-core.html">Warp Core project page</a> for release status.</p>
+
+        <div class="article-foot mono">
+          <a href="research-gap-or-wall.html">← Previous: A gap or a wall</a>
+          <a href="research.html">All research →</a>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <section class="cta slim">
+    <div class="wrap">
+      <footer class="mono">
+        <span>© 2026 Boulder Research</span>
+        <a href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+        <span class="portfolio-links">Portfolio: <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person</a> · <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware</a></span>
+        <span>Intelligence for interactive worlds</span>
+      </footer>
+    </div>
+  </section>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A game engine cannot run in a kernel. So the split moves. — Boulder Research</title>
+  <meta name="description" content="Why a Godot game can't be compiled into a GPU kernel, where the line between simulation and engine goes instead, and the state contract that makes thousands of copies cheap." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="projects.css" />
+  <link rel="stylesheet" href="research.css" />
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+    <nav class="nav">
+    <a href="index.html" class="brand" aria-label="Boulder Research home"></a>
+    <div class="nav-links mono">
+      <a href="index.html" class="hide-sm">Home</a>
+      <div class="nav-drop">
+        <a href="projects.html">Projects</a>
+        <button type="button" class="nav-drop-toggle" aria-expanded="false" aria-label="Show the Projects menu">▾</button>
+        <div class="nav-drop-menu">
+          <a href="project-warp-core.html">Warp Core</a>
+          <a href="project-miniloader.html">Miniloader</a>
+          <a href="project-astrolabe.html">Astrolabe</a>
+          <a href="research.html" aria-current="page">Research</a>
+        </div>
+      </div>
+      <a href="investors.html" class="hide-sm">Investors</a>
+      <a href="about.html" class="hide-sm">About</a>
+      <a class="btn" href="mailto:chris@kellogg.io?subject=Research">Get in touch</a>
+  </nav>
+  <script>
+  // T-439: a touchscreen has no hover, so the caret is a real button that
+  // pins the dropdown open on tap (the CSS reads .is-open). Hover still
+  // opens it for a mouse pointer.
+  (function () {
+    const drop = document.querySelector(".nav-drop");
+    const caret = drop && drop.querySelector(".nav-drop-toggle");
+    if (!caret) return;
+    caret.addEventListener("click", () => {
+      const open = drop.classList.toggle("is-open");
+      caret.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  })();
+  </script>
+
+  <header class="article-head">
+    <div class="wrap">
+      <div class="crumbs mono"><a href="index.html">Boulder Research</a> / <a href="research.html">Research</a> / Simulation architecture</div>
+      <h1>The engine can't go in the kernel.<br><span class="serif">So the split moves.</span></h1>
+      <p class="dek">Why a Godot game can't be compiled into a GPU kernel, where the line between simulation and engine goes instead, and the state contract that makes thousands of copies cheap.</p>
+      <div class="byline mono">
+        <span><b>Adhitya Mohan</b></span>
+        <time datetime="2026-11-10">10 November 2026</time>
+        <span>Simulation architecture</span>
+        <span>~8 min read</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="article-body">
+      <aside class="toc mono" aria-label="Contents">
+        <span>Contents</span>
+        <ol>
+          <li><a href="#mario">What made Mario possible</a></li>
+          <li><a href="#godot">Why Godot is different</a></li>
+          <li><a href="#split">Where the split goes</a></li>
+          <li><a href="#closure">The closure criterion</a></li>
+          <li><a href="#tiers">Two tiers decide the cost</a></li>
+          <li><a href="#order">Byte order is the contract</a></li>
+          <li><a href="#limits">What stays outside</a></li>
+        </ol>
+      </aside>
+
+      <article class="prose">
+        <p>A GPU kernel is a flat function over arrays. A game engine is pointer-chasing over an object graph. Those two sentences are the whole problem, and most of what follows comes from taking them seriously instead of hoping a clever compiler makes them go away.</p>
+        <p>We want thousands of independent copies of a game running at once, so that testing, search and training stop being limited by how many engine instances you can afford. The obvious plan is to put the engine on the GPU. That plan doesn't work, and the reason it doesn't work tells you what to do instead.</p>
+
+        <h2 id="mario">What made Mario possible</h2>
+        <p>We have run a whole commercial console game, Super Mario World, as GPU kernels. It works because of what the game <i>is</i>: a 65816 program, a single instruction stream over a flat address space. A recompiler lowers that stream to C, and a second backend lowers it to Warp. One GPU lane is one console. The state is a byte image with offsets known at compile time, and the ROM is shared read-only across every lane.</p>
+        <p>Notice what the Mario port did <i>not</i> do. It didn't recompile the picture processor. The SNES PPU has no instruction stream to recompile, so the port emulates it. Even in the friendliest possible case, part of the machine stayed outside the "compile it to the GPU" approach.</p>
+
+        <h2 id="godot">Why Godot is different</h2>
+        <p>Godot offers no such target. Its runtime is a scene graph traversed by pointer, with dynamic dispatch, reference-counted resources, and a scripting virtual machine whose values are tagged unions. A kernel can't follow a pointer to an object whose type it learns at run time. There is no lowering from that runtime to a kernel that preserves its meaning.</p>
+        <p>This isn't a matter of effort. You could spend years on a Godot-to-GPU compiler and the object model would still be the thing it can't express.</p>
+
+        <h2 id="split">Where the split goes</h2>
+        <p>If the engine can't move onto the GPU, the split between "simulation" and "presentation" doesn't disappear. It moves.</p>
+        <blockquote>The game's rules and physics become kernels. The engine becomes a renderer for one lane out of many.</blockquote>
+        <p>That is exactly the role the SNES PPU already had: a presentation device for state that the simulation produced. Godot keeps everything it's good at, and is very hard to flatten (scene graph, resource loading, scripting, rendering), and draws whichever lane you want to watch. The GPU runs the part that has to be multiplied.</p>
+        <p>The question then becomes precise. What exactly is "the state", such that a kernel holding only that state can step the world?</p>
+
+        <h2 id="closure">The closure criterion</h2>
+        <p>Write one tick of the game as a function:</p>
+        <span class="eq">s<sub>t+1</sub> = f(s<sub>t</sub>, a<sub>t</sub>)</span>
+        <p>The state representation is <b>complete when the tick is closed over it</b>: when <code>f</code> reads nothing but <code>s</code> and <code>a</code>. A value the tick has to fetch from the scene tree is a value the representation is missing.</p>
+        <p>We use this definition rather than a looser one because it's testable. Run the tick with the state buffer as the only readable source and assert that no read escapes it. A representation that passes is complete by construction, and one that fails names exactly what's absent. You don't argue about completeness; you run it.</p>
+
+        <h2 id="tiers">Two tiers decide the cost</h2>
+        <p>Every field is one of two kinds:</p>
+        <ul>
+          <li><b>Immutable and shared:</b> meshes, materials, textures, shaders, skeletons, level geometry, collision shapes, audio streams. One copy, read by every lane.</li>
+          <li><b>Mutable and per lane:</b> transforms, velocities, animation clocks, visibility, light parameters, camera state, input, telemetry. Each lane holds its own.</li>
+        </ul>
+        <p>This is the same split the Mario port used, and it decides the economics. N lanes cost N times the mutable tier plus the immutable tier once, not N times the world.</p>
+        <p>In our current layout the mutable tier is 77 fields in 13 blocks, with a lane stride of 10,064 bytes; the immutable tier is 68,736 bytes. The arithmetic is short:</p>
+        <span class="eq">4,096 × 10,064 B = 41,222,144 B ≈ 41.2 MB  (+ 68,736 B shared, once)</span>
+        <p>Four thousand copies of the game's changing state fit in about 41 MB. Adding a world means adding a save file, not another engine.</p>
+        <p>The layout is honest about what it reserves but doesn't use. The contact block has room for 64 contacts, and the kernel currently models one, so every lane carries 63 empty slots (2,520 bytes of zeros). A helper reports that shortfall rather than hiding it, because an image that silently omits state is worse than one that says what it omits.</p>
+        <figure class="figure">
+          <img src="lane-byte-map.svg" alt="One lane's 10,064 mutable bytes drawn block by block, with the 68,736-byte shared tier above it, four lane boundaries marked on the ruler, and the 64-slot contact block enlarged at the bottom showing one filled slot and 63 empty ones">
+          <figcaption>Field counts from warp-godot-report.pdf §2.3, Table 1 and Appendix A.1, drawn to scale in field count rather than bytes (the report gives counts, not per-block byte sizes), and computed by scripts/figures/build-figures.mjs. The 10,072 stride in the second row is worked arithmetic - the report names the per-lane header but never states its size.</figcaption>
+        </figure>
+
+        <h2 id="order">Byte order is part of the contract</h2>
+        <p>A count and an offset don't define a field. The order of its components does.</p>
+        <p>Godot's <code>Transform3D</code> stores the basis first and the origin second: nine floats, then three. Our kernel's body transform stored position first: three, then nine. A dump emitted Godot's order and the kernel read its own. The parity test <i>passed</i> while the kernel's <code>y</code> was zero, because both bodies rested near the ground and zero clamped to the surface.</p>
+        <div class="callout"><span class="mono">The failure mode</span>It was not a crash. It was a comparison that agreed for the wrong reason. Those are the bugs worth designing against, because nothing tells you they're there.</div>
+        <p>So the layout now declares an order for every multi-component field, and the generator rejects a specification that leaves one out. The layout is generated from one specification, the generator is idempotent (a second run produces byte-identical output), and a pin over the generated files fails if any of them drifts from what the generator would emit.</p>
+
+        <h2 id="limits">What stays outside</h2>
+        <p>Moving the split has consequences, and they should be stated as plainly as the result.</p>
+        <p><b>The engine is not in the kernel.</b> The scene graph, the resource loader, the scripting VM and the renderer aren't kernels and can't be. Anything that needs node lifecycle becomes a renderer-side effect driven from the state buffer, not a simulation input.</p>
+        <p><b>Script state isn't flattened.</b> A script instance holds a heap of tagged unions, and there's no generic way to flatten it, for the same reason the engine can't be lowered. Either the game declares which script variables are simulation state, and they get layout slots, or the rules live only in the kernels. Of the 52 layout fields that no declared rule writes, 37 are written by scripts. That is the size of the part the kernels don't own yet.</p>
+        <p>None of this is a reason to stop. It's the map of where the work is. The next piece, <a href="research-rules-and-faults.html">rules declared once and a graph that finds faults</a>, is about how we check that thousands of GPU copies really are the game.</p>
+
+        <p class="source">Adapted from <i>Running a Game Engine as Warp Kernels</i> (A. Mohan, draft report). All figures are from a deliberately simple Godot test scene, measured on our four-GPU machine. See the <a href="project-warp-core.html">Warp Core project page</a> for release status.</p>
+
+        <div class="article-foot mono">
+          <a href="research-engine-is-the-window.html">← Previous: The engine is the window</a>
+          <a href="research-rules-and-faults.html">Next: Rules declared once →</a>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <section class="cta slim">
+    <div class="wrap">
+      <footer class="mono">
+        <span>© 2026 Boulder Research</span>
+        <a href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+        <span class="portfolio-links">Portfolio: <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person</a> · <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware</a></span>
+        <span>Intelligence for interactive worlds</span>
+      </footer>
+    </div>
+  </section>
+</body>
+</html>

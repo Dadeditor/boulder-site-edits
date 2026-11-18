@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A gap you can close. A wall you route around. — Boulder Research</title>
+  <meta name="description" content="The Warp Core prototype's known limits, sorted into engineering gaps that time closes and architectural boundaries that no budget moves, with the plan for each." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="projects.css" />
+  <link rel="stylesheet" href="research.css" />
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+    <nav class="nav">
+    <a href="index.html" class="brand" aria-label="Boulder Research home"></a>
+    <div class="nav-links mono">
+      <a href="index.html" class="hide-sm">Home</a>
+      <div class="nav-drop">
+        <a href="projects.html">Projects</a>
+        <button type="button" class="nav-drop-toggle" aria-expanded="false" aria-label="Show the Projects menu">▾</button>
+        <div class="nav-drop-menu">
+          <a href="project-warp-core.html">Warp Core</a>
+          <a href="project-miniloader.html">Miniloader</a>
+          <a href="project-astrolabe.html">Astrolabe</a>
+          <a href="research.html" aria-current="page">Research</a>
+        </div>
+      </div>
+      <a href="investors.html" class="hide-sm">Investors</a>
+      <a href="about.html" class="hide-sm">About</a>
+      <a class="btn" href="mailto:chris@kellogg.io?subject=Research">Get in touch</a>
+  </nav>
+  <script>
+  // T-439: a touchscreen has no hover, so the caret is a real button that
+  // pins the dropdown open on tap (the CSS reads .is-open). Hover still
+  // opens it for a mouse pointer.
+  (function () {
+    const drop = document.querySelector(".nav-drop");
+    const caret = drop && drop.querySelector(".nav-drop-toggle");
+    if (!caret) return;
+    caret.addEventListener("click", () => {
+      const open = drop.classList.toggle("is-open");
+      caret.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  })();
+  </script>
+
+  <header class="article-head">
+    <div class="wrap">
+      <div class="crumbs mono"><a href="index.html">Boulder Research</a> / <a href="research.html">Research</a> / Simulation architecture</div>
+      <h1>A gap you can close.<br><span class="serif">A wall you route around.</span></h1>
+      <p class="dek">Our prototype has six documented limits. Five are engineering gaps that time and effort close. One is an architectural boundary that no budget moves, and the honest response to it is a different plan, not a bigger one.</p>
+      <div class="byline mono">
+        <span><b>Boulder Research</b></span>
+        <time datetime="2026-11-10">10 November 2026</time>
+        <span>Simulation architecture</span>
+        <span>~7 min read</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="article-body">
+      <aside class="toc mono" aria-label="Contents">
+        <span>Contents</span>
+        <ol>
+          <li><a href="#kinds">Two kinds of limit</a></li>
+          <li><a href="#fields">The unverified fields: a gap</a></li>
+          <li><a href="#scripts">Scripts on the GPU: a wall</a></li>
+          <li><a href="#translate">Translate, don't port</a></li>
+          <li><a href="#rest">The other four</a></li>
+          <li><a href="#map">The map</a></li>
+        </ol>
+      </aside>
+
+      <article class="prose">
+        <p>The earlier essays end with what the prototype doesn't do: <a href="research-engine-as-kernels.html#limits">what stays outside the kernel</a>, <a href="research-rules-and-faults.html#parity">the one parity result that doesn't match</a>, <a href="research-four-gpus.html#scaling">what four cards don't deliver</a>. This piece collects those limits in one place and asks a blunter question of each: does time fix it?</p>
+
+        <h2 id="kinds">Two kinds of limit</h2>
+        <p>A limit is either a <b>gap</b> or a <b>wall</b>. A gap exists because nobody has done the work yet; the path is known and effort closes it. A wall exists because two things are fundamentally incompatible; effort spent pushing on it is wasted, and the only progress is to change what you're trying to do.</p>
+        <p>The distinction matters because the two look identical on a list of limitations, and they call for opposite responses. Most of ours are gaps. The two clearest cases, one of each, are worth taking first.</p>
+
+        <h2 id="fields">The unverified fields: a gap</h2>
+        <p>Long-run parity with Godot is proven on 30 of the 77 state fields. Godot's save data covers 55 fields, so 22 fields can't be compared against Godot at all. The reason is mundane: Godot's state dump never writes them out.</p>
+        <p>That is a gap. Godot is open source, so its C++ can be extended to serialise every field. Once all 77 are visible to the oracle, the same gates and causal graph that already work on 30 fields enforce parity on all of them, and any drift they find is traceable by the same machinery. Nothing about the architecture changes; the work is instrumentation.</p>
+
+        <h2 id="scripts">Scripts on the GPU: a wall</h2>
+        <p>Of the 52 layout fields that no declared rule writes, 37 are written by game scripts. Those scripts run in Godot's scripting virtual machine, and no amount of money makes that VM run efficiently on a GPU.</p>
+        <p>This is the same argument as <a href="research-engine-as-kernels.html">the engine-in-the-kernel essay</a>. A GPU kernel is a flat function over arrays. A script runtime is pointer-chasing, dynamic dispatch and tagged unions. Those are incompatible execution models, not an unoptimised pairing.</p>
+        <div class="callout"><span class="mono">The expensive non-answer</span>You could pay engineers to rewrite every dynamic system in a game (quests, UI, dialogue, enemy AI) by hand as flat arrays. That doesn't overcome the limit. It abandons Godot's scripting and builds a custom data-oriented engine inside the kernels, one game at a time.</div>
+
+        <h2 id="translate">Translate, don't port</h2>
+        <p>The wall doesn't move, but the work of going around it can be automated. Most game logic follows a small number of predictable shapes, and each has a flat, fixed-size equivalent:</p>
+        <figure class="table">
+          <table>
+            <thead><tr><th>In a script</th><th>On the GPU</th></tr></thead>
+            <tbody>
+              <tr><td>state machine (<code>if quest_step == 3</code>)</td><td>a flag or byte per lane</td></tr>
+              <tr><td>behaviour tree</td><td>a lookup table and a vectorised decision loop</td></tr>
+              <tr><td>event log, UI alerts</td><td>a fixed-capacity ring buffer in the lane's state</td></tr>
+              <tr><td>object with scattered fields</td><td>fixed-stride slots in the state contract</td></tr>
+            </tbody>
+          </table>
+          <figcaption>The pattern mapping an automated translator would apply. This is a plan, not built work.</figcaption>
+        </figure>
+        <p>The plan is an AI-assisted transpiler that rewrites game scripts into the rule language. What makes that more than a code generator is the verification already in place. Because every rule is <a href="research-rules-and-faults.html">declared once and lowered three times</a>, each translation can be run on the GPU and against the reference and checked by the parity gates. When the outputs diverge, the causal graph says which field diverged first, and the translator revises until parity passes.</p>
+        <p>The open question is how much real game logic fits these shapes. We won't know until we run it on real games, and we'll report the fraction that doesn't.</p>
+
+        <h2 id="rest">The other four</h2>
+        <p><b>Collision events land one step late.</b> The kernel records 74 contacts to Godot's 78 over 120 steps. This is structural, not a bug: the declared order makes contact detection read the previous step's transform, and declaring it same-step creates a cycle the order validator rejects. Splitting detection from resolution breaks the cycle. A gap.</p>
+        <p><b>The test scene is minimal.</b> One physics body, a door and a trigger, and the kernel models one contact per world. The layout already reserves 64 contacts per world, so the next step is a multi-contact solver and a complete small Godot game ported through every gate. A gap.</p>
+        <p><b>There is no head-to-head benchmark.</b> We have not measured Warp Core against many headless Godot instances on equal hardware, and rendering cost for watched lanes is unmeasured. Until that comparison exists we don't quote a speedup. A gap, and the most important one to close.</p>
+        <p><b>Four-card training scales poorly on this machine.</b> On this machine's PCIe layout, data-parallel training reaches 0.77× scaling only with about sixteen micro-batches per collective, and below that four cards are a loss. This limits model training only: simulated worlds run independently and need no cross-card traffic. A hardware choice rather than a design limit.</p>
+
+        <h2 id="map">The map</h2>
+        <figure class="table">
+          <table>
+            <thead><tr><th>Limit</th><th>Kind</th><th>Planned response</th></tr></thead>
+            <tbody>
+              <tr><td>22 of 77 fields not comparable</td><td>gap</td><td>instrument Godot's C++ to dump every field</td></tr>
+              <tr><td>37 fields written by scripts</td><td>wall</td><td>translate scripts into rules, verified by the gates</td></tr>
+              <tr><td>contacts one step late (74 vs 78)</td><td>gap</td><td>split contact detection from resolution</td></tr>
+              <tr><td>minimal scene, one contact</td><td>gap</td><td>multi-contact solver; port a complete game</td></tr>
+              <tr><td>no baseline, rendering unmeasured</td><td>gap</td><td>benchmark against headless Godot on equal hardware</td></tr>
+              <tr><td>four-card training at 0.77×</td><td>gap (hardware)</td><td>better-connected cards or cloud bursts for training</td></tr>
+            </tbody>
+          </table>
+          <figcaption>Each limit is stated in <i>Running a Game Engine as Warp Kernels</i>. The responses are plans; we'll publish the results as measured.</figcaption>
+        </figure>
+        <p>None of these blocks the architecture. They are where the work is. The last piece in this series, <a href="research-priced-per-copy.html">Simulation is priced per copy</a>, is about what the architecture is for once they're closed.</p>
+
+        <p class="source">Adapted from <i>Running a Game Engine as Warp Kernels</i> (A. Mohan, draft report) and our internal notes on its limitations.</p>
+
+        <div class="article-foot mono">
+          <a href="research-four-gpus.html">← Previous: Four GPUs, measured</a>
+          <a href="research-priced-per-copy.html">Next: Priced per copy →</a>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <section class="cta slim">
+    <div class="wrap">
+      <footer class="mono">
+        <span>© 2026 Boulder Research</span>
+        <a href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+        <span class="portfolio-links">Portfolio: <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person</a> · <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware</a></span>
+        <span>Intelligence for interactive worlds</span>
+      </footer>
+    </div>
+  </section>
+</body>
+</html>

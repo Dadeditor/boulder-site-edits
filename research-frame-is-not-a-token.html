@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A frame is not a token. — Boulder Research</title>
+  <meta name="description" content="Why world models default to the datacenter: the arithmetic of predicting video instead of text, and why more compute buys fidelity but not correctness." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="projects.css" />
+  <link rel="stylesheet" href="research.css" />
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+    <nav class="nav">
+    <a href="index.html" class="brand" aria-label="Boulder Research home"></a>
+    <div class="nav-links mono">
+      <a href="index.html" class="hide-sm">Home</a>
+      <div class="nav-drop">
+        <a href="projects.html">Projects</a>
+        <button type="button" class="nav-drop-toggle" aria-expanded="false" aria-label="Show the Projects menu">▾</button>
+        <div class="nav-drop-menu">
+          <a href="project-warp-core.html">Warp Core</a>
+          <a href="project-miniloader.html">Miniloader</a>
+          <a href="project-astrolabe.html">Astrolabe</a>
+          <a href="research.html" aria-current="page">Research</a>
+        </div>
+      </div>
+      <a href="investors.html" class="hide-sm">Investors</a>
+      <a href="about.html" class="hide-sm">About</a>
+      <a class="btn" href="mailto:chris@kellogg.io?subject=Research">Get in touch</a>
+  </nav>
+  <script>
+  // T-439: a touchscreen has no hover, so the caret is a real button that
+  // pins the dropdown open on tap (the CSS reads .is-open). Hover still
+  // opens it for a mouse pointer.
+  (function () {
+    const drop = document.querySelector(".nav-drop");
+    const caret = drop && drop.querySelector(".nav-drop-toggle");
+    if (!caret) return;
+    caret.addEventListener("click", () => {
+      const open = drop.classList.toggle("is-open");
+      caret.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  })();
+  </script>
+
+  <header class="article-head">
+    <div class="wrap">
+      <div class="crumbs mono"><a href="index.html">Boulder Research</a> / <a href="research.html">Research</a> / World models</div>
+      <h1>A frame is not a token.<br><span class="serif">Compute buys fidelity, not correctness.</span></h1>
+      <p class="dek">A language model states the outcome. A world model has to produce the process. The arithmetic of that difference is why world models live in datacenters today, and why a bigger datacenter doesn't fix what's wrong with them.</p>
+      <div class="byline mono">
+        <span><b>Boulder Research</b></span>
+        <time datetime="2026-11-10">10 November 2026</time>
+        <span>World models</span>
+        <span>~7 min read</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="article-body">
+      <aside class="toc mono" aria-label="Contents">
+        <span>Contents</span>
+        <ol>
+          <li><a href="#process">Outcome versus process</a></li>
+          <li><a href="#arithmetic">The arithmetic of a frame</a></li>
+          <li><a href="#memory">Memory, not FLOPs</a></li>
+          <li><a href="#fixes">What the industry fixes do</a></li>
+          <li><a href="#fidelity">Fidelity is not correctness</a></li>
+          <li><a href="#follows">What follows</a></li>
+        </ol>
+      </aside>
+
+      <article class="prose">
+        <p>Ask a language model what happens when a knife is pushed off a counter and it will tell you the knife falls. Ask a world model the same question and it has to produce the fall: the slide, the tip, the rotation, the bounce. Robots, simulators, digital twins and automated testing all need the second kind of model. It doesn't come from scaling the first.</p>
+
+        <h2 id="process">Outcome versus process</h2>
+        <p>The language-model playbook is: collect everything, predict the next unit, scale. It worked because text is already compressed. The people who wrote it threw away everything that didn't matter before the model ever saw it.</p>
+        <p>Video arrives raw. A world model that predicts observations is predicting the uncompressed process, one frame after another, and each frame is conditioned on the actions taken so far. That changes the unit the whole cost model is built on.</p>
+
+        <h2 id="arithmetic">The arithmetic of a frame</h2>
+        <p>Start with one raw 1080p frame. It is 1,920 × 1,080 pixels at three bytes each:</p>
+        <span class="eq">1,920 × 1,080 × 3 B = 6,220,800 B ≈ 1.5M tokens' worth of bytes</span>
+        <p>At roughly four bytes of text per token, a single frame outweighs a million-token context. Run the comparison the other way and a 131,072-token context, which holds a novel for a language model, holds about <b>0.2 seconds</b> of video.</p>
+        <p>Attention makes it worse. Generating one frame with a 20-step diffusion model takes roughly <b>1,250 times</b> as many attention comparisons as generating one token at a 4K context. Every one of those frames is then the input to the next one.</p>
+        <figure class="table">
+          <table>
+            <thead><tr><th>Quantity</th><th>Value</th><th>Condition</th></tr></thead>
+            <tbody>
+              <tr><td>Bytes in one raw frame, as tokens</td><td class="n">~1.5M</td><td>1080p, 3 bytes per pixel, ~4 bytes per token</td></tr>
+              <tr><td>Video held by a 131,072-token context</td><td class="n">~0.2 s</td><td>same frame accounting</td></tr>
+              <tr><td>Attention comparisons, frame vs. token</td><td class="n">~1,250×</td><td>20-step diffusion frame vs. one token at 4K context</td></tr>
+              <tr><td>KV cache for one minute of rollout</td><td class="n">&gt;200 GB</td><td>14B model, ~0.73 MB per token (reported by WorldKV)</td></tr>
+              <tr><td>KV cache for a ten-second rollout</td><td class="n">~33 GB</td><td>fills a 32 GB device</td></tr>
+              <tr><td>Robot-control latency</td><td class="n">3.6× slower than real time</td><td>naive path, 5.7 s per 1.6 s action chunk (reported for DreamZero)</td></tr>
+            </tbody>
+          </table>
+          <figcaption>Working-paper arithmetic and published third-party figures, not our measurements. Each holds only under the condition beside it.</figcaption>
+        </figure>
+
+        <h2 id="memory">Memory, not FLOPs</h2>
+        <p>The number that decides where world models run is not the compute per frame. It is what the model has to hold while it predicts.</p>
+        <p>An autoregressive model keeps a key-value cache of everything it has attended to. At about 0.73 MB per token for a 14B-parameter model, one minute of interactive rollout passes 200 GB, more than a single B200 holds. Even a ten-second rollout needs about 33 GB, so one session fills a 32 GB device and batching collapses: you can't amortise the model across users when one user already uses the whole card.</p>
+        <figure class="figure">
+          <img src="capacity-arithmetic.svg" alt="Per-minute byte streams of the reference pipeline on the left - compressed video, VAE latents, raw pixels, and two key-value cache figures - and on the right, how many seconds of rollout each card tier can hold at the uncompressed cache rate">
+          <figcaption>Stream rates from docs/main.pdf Appendix A.3; the cache bounds are the published WorldKV figure and the uncompressed estimate from equation 9. Card capacities are vendor figures, not measurements from this repository, and the fit time divides capacity by growth - it is not a measured run.</figcaption>
+        </figure>
+        <p>Latency follows from the same place. A naive robot-control path built on a video world model has been reported at 5.7 seconds for each 1.6-second action chunk, 3.6 times slower than the world it is meant to keep up with.</p>
+
+        <h2 id="fixes">What the industry fixes do</h2>
+        <p>There are good engineering fixes: distillation to fewer diffusion steps, reusing work between steps, splitting guidance, quantization. Stacked together they reach roughly 38× on a GB200.</p>
+        <p>Every one of them shortens or hides the same loop. None changes what the model holds while it predicts, which is where the cost comes from. That's why the default answer to "how do we run a world model?" is still "in a datacenter".</p>
+
+        <h2 id="fidelity">Fidelity is not correctness</h2>
+        <p>Suppose cost weren't a problem. Three properties of how these models are trained mean more compute still wouldn't make them right.</p>
+        <p><b>The loss.</b> Pixel and diffusion losses measure distance to one recording. A cup that lands a centimetre to the left is physically correct and still penalised, so the model learns to blur between possible futures instead of committing to one that obeys physics.</p>
+        <p><b>The units.</b> Video encoders discard detail inside each 8-pixel cell and each 4-frame stride. Contact and velocity live exactly there. No larger model downstream can recover what the encoder threw away.</p>
+        <p><b>The errors.</b> A wrong token is local and recoverable. A drifted pixel feeds the next frame. A ten-second rollout at 24 frames per second is 240 predictions, each built on the last one's mistakes.</p>
+        <blockquote>A blurry model that gets the physics right beats a sharp model that gets it wrong. The planner consumes the physics.</blockquote>
+        <p>Compute buys fidelity: sharper frames, longer clips. What a robot, a planner or a test harness needs is correctness, and that comes from what the model represents and what it is checked against, not from its size.</p>
+
+        <h2 id="follows">What follows</h2>
+        <p>If the bottleneck is what the model holds and what it is anchored to, then the interesting problems are representation and systems problems. Our working paper closes by naming four of them. The next piece, <a href="research-four-open-problems.html">four open problems and a desk-sized target</a>, takes them one at a time.</p>
+
+        <p class="source">Adapted from our technical brief and working paper on world-model foundations, costs and open problems. Third-party figures (WorldKV, DreamZero, the GB200 speedups) are as published by their authors; we have not reproduced them.</p>
+
+        <div class="article-foot mono">
+          <a href="research.html">← All research</a>
+          <a href="research-four-open-problems.html">Next: Four open problems →</a>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <section class="cta slim">
+    <div class="wrap">
+      <footer class="mono">
+        <span>© 2026 Boulder Research</span>
+        <a href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+        <span class="portfolio-links">Portfolio: <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person</a> · <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware</a></span>
+        <span>Intelligence for interactive worlds</span>
+      </footer>
+    </div>
+  </section>
+</body>
+</html>

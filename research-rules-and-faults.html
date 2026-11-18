@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rules declared once, and a graph that can find a fault — Boulder Research</title>
+  <meta name="description" content="How we write each game rule once, compile it to the GPU, Python and Godot, derive the update order and causal graph from the declarations, and prove the graph localises faults." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="projects.css" />
+  <link rel="stylesheet" href="research.css" />
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+    <nav class="nav">
+    <a href="index.html" class="brand" aria-label="Boulder Research home"></a>
+    <div class="nav-links mono">
+      <a href="index.html" class="hide-sm">Home</a>
+      <div class="nav-drop">
+        <a href="projects.html">Projects</a>
+        <button type="button" class="nav-drop-toggle" aria-expanded="false" aria-label="Show the Projects menu">▾</button>
+        <div class="nav-drop-menu">
+          <a href="project-warp-core.html">Warp Core</a>
+          <a href="project-miniloader.html">Miniloader</a>
+          <a href="project-astrolabe.html">Astrolabe</a>
+          <a href="research.html" aria-current="page">Research</a>
+        </div>
+      </div>
+      <a href="investors.html" class="hide-sm">Investors</a>
+      <a href="about.html" class="hide-sm">About</a>
+      <a class="btn" href="mailto:chris@kellogg.io?subject=Research">Get in touch</a>
+  </nav>
+  <script>
+  // T-439: a touchscreen has no hover, so the caret is a real button that
+  // pins the dropdown open on tap (the CSS reads .is-open). Hover still
+  // opens it for a mouse pointer.
+  (function () {
+    const drop = document.querySelector(".nav-drop");
+    const caret = drop && drop.querySelector(".nav-drop-toggle");
+    if (!caret) return;
+    caret.addEventListener("click", () => {
+      const open = drop.classList.toggle("is-open");
+      caret.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  })();
+  </script>
+
+  <header class="article-head">
+    <div class="wrap">
+      <div class="crumbs mono"><a href="index.html">Boulder Research</a> / <a href="research.html">Research</a> / Verification</div>
+      <h1>Rules declared once.<br><span class="serif">A graph that can find a fault.</span></h1>
+      <p class="dek">Four hand-kept descriptions of one rule drifted apart and still passed their tests. Here is what replaced them, and how we measure whether a dependency graph is worth having.</p>
+      <div class="byline mono">
+        <span><b>Adhitya Mohan</b></span>
+        <time datetime="2026-11-10">10 November 2026</time>
+        <span>Verification</span>
+        <span>~9 min read</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="article-body">
+      <aside class="toc mono" aria-label="Contents">
+        <span>Contents</span>
+        <ol>
+          <li><a href="#drift">Four artifacts, one rule</a></li>
+          <li><a href="#declare">The declaration</a></li>
+          <li><a href="#derive">What derives from it</a></li>
+          <li><a href="#backends">Three backends, one answer</a></li>
+          <li><a href="#graph">A graph that finds faults</a></li>
+          <li><a href="#gates">Ten gates, each a mutation</a></li>
+          <li><a href="#parity">What parity means</a></li>
+        </ol>
+      </aside>
+
+      <article class="prose">
+        <p>Running thousands of copies of a game on a GPU is only useful if each copy is the game. If a GPU lane drifts from what Godot would have done, every test result and every trained policy built on it inherits the error. So the interesting engineering isn't the speed. It's the machinery that lets you believe the speed.</p>
+
+        <h2 id="drift">Four artifacts, one rule</h2>
+        <p>A rule written directly as a kernel is one example deep. The gravity rule in our first version was exactly that: a hand-written Warp function, a hand-maintained edge table beside it, a hand-maintained map from groups to fields beside that, and a causal graph reconstructed from the map.</p>
+        <p>Four artifacts described one rule, and they drifted. The camera phase read a transform field that no declared edge covered. The write-mask bits were hardcoded against an earlier update order, so the input phase reported itself as audio and the header phase set a bit outside the valid range. <b>Both passed their tests.</b></p>
+        <p>The lesson isn't "be more careful". Any fact that's written down in more than one place will eventually disagree with itself. The fix is to write it down once.</p>
+
+        <h2 id="declare">The declaration</h2>
+        <p>A rule is now a declaration with six parts: a name, a group, the fields it reads, the fields it writes, its parameters, and a body. One declaration is lowered to three backends:</p>
+        <figure class="table">
+          <table>
+            <thead><tr><th>Backend</th><th>Runs on</th><th>Why it exists</th></tr></thead>
+            <tbody>
+              <tr><td><b>Warp</b></td><td>the GPU</td><td>the only one that scales to thousands of lanes</td></tr>
+              <tr><td><b>numpy</b></td><td>the host</td><td>the cheapest oracle, so parity has a reference</td></tr>
+              <tr><td><b>GDScript</b></td><td>Godot</td><td>the differential gate, so the engine gets a chance to disagree</td></tr>
+            </tbody>
+          </table>
+          <figcaption>The last column is the reason each backend exists, which is not the same as what it computes.</figcaption>
+        </figure>
+
+        <h2 id="derive">What derives from the declaration</h2>
+        <p>Once reads and writes are declared, three things that used to be maintained by hand become computed:</p>
+        <ul>
+          <li><b>The update order.</b> An edge is <code>same_step</code> when one rule reads a field another rule writes in the same step, and <code>next_step</code> when it reads the previous step's value. A topological sort over the same-step edges gives the order, and the kernel calls one function per phase in that order.</li>
+          <li><b>The write-mask bits.</b> The bit for a phase is its index in the shipped order. It can't go stale against an earlier order, because there's only one.</li>
+          <li><b>The causal graph.</b> Built from the same edges.</li>
+        </ul>
+        <p>The derivation also disagreed with the hand-written table, which is the best evidence that it was worth doing. It produced 37 edges against the hand table's 36, reproducing 34 of them and printing a reason for every difference. Three were real corrections. The input rule, for example, is a read-modify-write on linear velocity, so it reads the previous step's value and needs an incoming next-step edge. The hand table had treated input as coming from outside and declared none.</p>
+
+        <h2 id="backends">Three backends, one answer</h2>
+        <p>The gravity rule, declared once, produces <b>bit-identical</b> results from the Warp and numpy backends over 120 ticks and four lanes, on all 25 fields the rule set touches. The GDScript backend agrees with numpy bit-identically too, not merely within a tolerance. Porting the old hand-written kernel through the new representation reproduces it bit-identically, which checks that changing the representation didn't change the arithmetic.</p>
+        <p>The representation also states its own gap. It declares 25 fields; the layout has 77. The other 52 are listed in a separate file, each with the mechanism that writes it, or the word <code>nothing</code>. A field that's both written by a rule and listed there is a load error, and a field in neither place is a coverage failure. That's coverage proved rather than asserted.</p>
+
+        <h2 id="graph">A graph that can find a fault</h2>
+        <p>A dependency graph over the state exists for one purpose: to trace a fault from where it's introduced to where it becomes visible. A graph that can't do that is documentation.</p>
+        <p>The construction rules come from a specification written for game engines and worked through on a chemical-plant simulator. Nodes are the code's variables, grouped by what they hold. An edge means one variable is computed from another, and every edge is marked as acting within a state update or carrying into the next. The order of updates within a step is part of the graph, not a convention outside it.</p>
+        <p>The most useful structure in that worked example is its <b>delay nodes</b>: held samples, valve memory, controller memory, each one previous-value storage. Two of the ten documented bug classes live only there. An update-order error shows up as a downstream node lagging an upstream one by exactly one step. Order dependence shows up as two identical runs diverging from one node. A graph that collapses a delay node into its source can't express either.</p>
+        <p>That's why our layout carries previous values unconditionally. Godot marks two of its four transform variants as interpolation-only, and stores five camera parameters as interpolated properties. The kernel can't know which ones the renderer will use, so the image carries all of them and the graph gives them their own group.</p>
+
+        <h2 id="gates">Ten gates, each a mutation</h2>
+        <p>The graph's value is measurable, so we measure it. Ten gates each inject one rule mutation, one per documented bug class, run the mutated world beside the reference, and assert three things: the name of the first field to diverge, a value signature, and the number of hops from the injected fault to that field.</p>
+        <figure class="table">
+          <table>
+            <thead><tr><th>Bug class</th><th>What it looks like in a trace</th></tr></thead>
+            <tbody>
+              <tr><td>clock misalignment</td><td>time nodes wrong at a constant time</td></tr>
+              <tr><td>collision check gap</td><td>position jumps while velocity holds</td></tr>
+              <tr><td>grid boundary miss</td><td>collision nodes silent at regular positions</td></tr>
+              <tr><td>contact irresolution</td><td>contact nodes wrong only while touching</td></tr>
+              <tr><td>restitution error</td><td>velocity grows after each collision</td></tr>
+              <tr><td>update order error</td><td>downstream lags upstream by one step</td></tr>
+              <tr><td>event dispatch error</td><td>reaction at zero or double strength</td></tr>
+              <tr><td>precision loss</td><td>jitter grows with distance from the origin</td></tr>
+              <tr><td>timer overflow</td><td>timer wrong at the same time every run</td></tr>
+              <tr><td>order dependence</td><td>two identical runs diverge from one node</td></tr>
+            </tbody>
+          </table>
+        </figure>
+        <p><b>All ten pass.</b> This is mutation testing, not a signature the tool also defines, and that distinction is what makes the result mean something. The two-hop case uses a synthetic unrecorded impulse, which is the shape the specification describes: a fault that changes a variable nobody records, which then changes one somebody does.</p>
+
+        <h2 id="parity">What parity means</h2>
+        <p>Parity is claimed against Godot's own physics, not against ourselves. Both sides run the same rule from the same initial state with the same time step, and the comparison prints both sides rather than just a difference. Every number carries the condition it holds under:</p>
+        <figure class="table">
+          <table>
+            <thead><tr><th>Property</th><th>Value</th><th>Holds when</th></tr></thead>
+            <tbody>
+              <tr><td>free fall, y and v<sub>y</sub></td><td class="n">0.000000</td><td>the body hasn't touched the ground</td></tr>
+              <tr><td>post contact, y</td><td class="n">0.000152</td><td>within a 0.05 tolerance over 120 ticks</td></tr>
+              <tr><td>post contact, v<sub>y</sub></td><td class="n">0.001831</td><td>same run, same tolerance</td></tr>
+              <tr><td>resume, at the instant</td><td class="n">0.000000</td><td>the Godot dump is the only input</td></tr>
+              <tr><td>resume, continuation</td><td class="n">0.005802</td><td>a constant offset in y, not zero</td></tr>
+              <tr><td>long horizon</td><td class="n">0.0</td><td>23,820 ticks, 30 of 77 fields, 144 restarts</td></tr>
+              <tr><td>lane independence</td><td class="n">4,096 lanes</td><td>each matches a single-lane run over 8 ticks</td></tr>
+            </tbody>
+          </table>
+        </figure>
+        <p>One result doesn't match, and it's stated rather than tolerated. The continuous fields agree; the contact <i>event</i> stream doesn't. The kernel fires 74 contact ticks to Godot's 78, and its first contact is one tick late. That latency is structural: the declared order makes contact read the previous step's transform. Declaring it same-step instead creates a three-node cycle, which the order validator rejects. It's the update-order bug class from the table above, showing up as a property of the declared order rather than as a mistake.</p>
+        <p>Precision is the other sharp edge. Against a 32-bit reference over 50 ticks and 32 lanes, bf16 gives a worst error of 0.905 on linear velocity and flips the contact flag; fp16 gives 0.157 and flips both the contact and sleeping flags. bf16 is worse here because it has eight mantissa bits to fp16's ten, and its advantage, range, is something this workload doesn't need. Both flip a contact flag, which means lower precision changes the outcome of a collision, not just its rounding.</p>
+        <p>How several of these gates were themselves wrong, and how we found out, is the subject of <a href="research-two-audits.html">a separate essay</a>.</p>
+
+        <p class="source">Adapted from <i>Running a Game Engine as Warp Kernels</i> (A. Mohan, draft report). This machinery ships as part of <a href="project-warp-core.html#verify">Warp Core</a>.</p>
+
+        <div class="article-foot mono">
+          <a href="research-engine-as-kernels.html">← Previous: The split moves</a>
+          <a href="research-two-audits.html">Next: Two audits →</a>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <section class="cta slim">
+    <div class="wrap">
+      <footer class="mono">
+        <span>© 2026 Boulder Research</span>
+        <a href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+        <span class="portfolio-links">Portfolio: <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person</a> · <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware</a></span>
+        <span>Intelligence for interactive worlds</span>
+      </footer>
+    </div>
+  </section>
+</body>
+</html>

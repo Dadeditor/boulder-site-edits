@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The test passed. The claim was still wrong. — Boulder Research</title>
+  <meta name="description" content="Two adversarial audits refuted a sign-off we had already given. What they found, why every defect had passed a test, and the one mechanism behind all of them." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="projects.css" />
+  <link rel="stylesheet" href="research.css" />
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+    <nav class="nav">
+    <a href="index.html" class="brand" aria-label="Boulder Research home"></a>
+    <div class="nav-links mono">
+      <a href="index.html" class="hide-sm">Home</a>
+      <div class="nav-drop">
+        <a href="projects.html">Projects</a>
+        <button type="button" class="nav-drop-toggle" aria-expanded="false" aria-label="Show the Projects menu">▾</button>
+        <div class="nav-drop-menu">
+          <a href="project-warp-core.html">Warp Core</a>
+          <a href="project-miniloader.html">Miniloader</a>
+          <a href="project-astrolabe.html">Astrolabe</a>
+          <a href="research.html" aria-current="page">Research</a>
+        </div>
+      </div>
+      <a href="investors.html" class="hide-sm">Investors</a>
+      <a href="about.html" class="hide-sm">About</a>
+      <a class="btn" href="mailto:chris@kellogg.io?subject=Research">Get in touch</a>
+  </nav>
+  <script>
+  // T-439: a touchscreen has no hover, so the caret is a real button that
+  // pins the dropdown open on tap (the CSS reads .is-open). Hover still
+  // opens it for a mouse pointer.
+  (function () {
+    const drop = document.querySelector(".nav-drop");
+    const caret = drop && drop.querySelector(".nav-drop-toggle");
+    if (!caret) return;
+    caret.addEventListener("click", () => {
+      const open = drop.classList.toggle("is-open");
+      caret.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  })();
+  </script>
+
+  <header class="article-head">
+    <div class="wrap">
+      <div class="crumbs mono"><a href="index.html">Boulder Research</a> / <a href="research.html">Research</a> / Method</div>
+      <h1>The test passed.<br><span class="serif">The claim was still wrong.</span></h1>
+      <p class="dek">Two adversarial audits refuted a sign-off we had already given. None of the defects were subtle, and every one had passed a test. The mechanism behind them is the same each time.</p>
+      <div class="byline mono">
+        <span><b>Adhitya Mohan</b></span>
+        <time datetime="2026-11-10">10 November 2026</time>
+        <span>Method</span>
+        <span>~6 min read</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="article-body">
+      <aside class="toc mono" aria-label="Contents">
+        <span>Contents</span>
+        <ol>
+          <li><a href="#signoff">A sign-off, then a refutation</a></li>
+          <li><a href="#quantity">The gate tested a different quantity</a></li>
+          <li><a href="#exemption">Satisfied by an exemption</a></li>
+          <li><a href="#outran">Claims that outran their tools</a></li>
+          <li><a href="#control">A control that guarded nothing</a></li>
+          <li><a href="#held">What withstood attack</a></li>
+          <li><a href="#mechanism">The mechanism</a></li>
+        </ol>
+      </aside>
+
+      <article class="prose">
+        <p>The work described here was carried out by AI agents, and a planner checked the result. The planner signed the work off as complete. It ran on a different model from the agents that did the work, which was supposed to make it independent. It wasn't independent enough.</p>
+
+        <h2 id="signoff">A sign-off, then a refutation</h2>
+        <p>The planner was asked whether the goal had been reached, and it looked for reasons to say yes. An adversary was then asked to <i>refute</i> the same claim. Same evidence, different question. It found a defect in its first reading of the success test, and a second audit found more.</p>
+        <p>Every finding was either fixed or explicitly scoped out. The defects are worth writing down because they generalise far beyond this project.</p>
+
+        <h2 id="quantity">The gate tested a different quantity</h2>
+        <p>The gate for resuming a lane from a Godot save computed its verdict from position alone. It never read velocity. Its own table printed a velocity divergence of 0.137 at tick 63, its verdict line printed a match, and it exited zero.</p>
+        <p>The property said "resumable with zero error". The gate certified one instant. Those are different claims, and the difference was invisible to anyone who trusted the verdict line instead of the table above it.</p>
+        <p>Making the gate honest exposed a real defect. The kernel was micro-bouncing at 0.0327 while Godot settled to zero, because the settle threshold never fired. After the fix the velocity difference is 0.000091 and the verdict is a match <b>at the same tolerance</b>: a defect fixed, not a tolerance moved.</p>
+
+        <h2 id="exemption">The property was satisfied by an exemption</h2>
+        <p>An orphan check, meant to confirm that every declared field has a node in the causal graph, returned an empty list for a layout in which eight fields had none. The check exempted the shared, immutable tier by construction. The specification had explicitly rejected allowing named exceptions. The implementation was a named exception list.</p>
+        <p>The property now says which tier it covers, and the exclusion is derived from the same declaration the coverage check reads.</p>
+
+        <h2 id="outran">The goal claimed more than the tools measured</h2>
+        <p>Three properties outran their tools:</p>
+        <ul>
+          <li>The goal said <b>zero error</b>; the tool measured a constant offset.</li>
+          <li>It said <b>every field</b>; the tool compared 30 of 77.</li>
+          <li>It said <b>every declared field</b>; the check covered the mutable tier only.</li>
+        </ul>
+        <p>There were three ways to resolve that. Weakening the tool would have hidden the gap. Leaving the claim standing would have made the record wrong. We restated the goal to match the measurement. That's why our published numbers read like "bit-identical over 23,820 ticks, on 30 of the 77 fields" rather than something rounder.</p>
+
+        <h2 id="control">A negative control absorbed by the fix it guarded</h2>
+        <p>A negative control is a deliberately broken input that the gate must reject. The resume gate's control perturbed velocity by 0.2. The new settle rule (the fix above) clamped that to 0.036 after one step, below tolerance, and the gate passed on a lane that was genuinely wrong. The control now perturbs position, which no rule absorbs.</p>
+        <p>One more finding belongs in the same family: a throughput "gate" that parsed a document and measured nothing. A gate that doesn't run the thing isn't a gate.</p>
+
+        <figure class="table">
+          <table>
+            <thead><tr><th>Finding</th><th>What it was</th><th>Class</th></tr></thead>
+            <tbody>
+              <tr><td>resume gate</td><td>verdict from one field, table from two</td><td>gate tests the wrong thing</td></tr>
+              <tr><td>orphan check</td><td>empty list from an exemption</td><td>property weaker than stated</td></tr>
+              <tr><td>goal wording</td><td>three properties outran their tools</td><td>claim exceeds measurement</td></tr>
+              <tr><td>negative control</td><td>absorbed by the settle rule</td><td>control guards nothing</td></tr>
+              <tr><td>throughput gate</td><td>parsed a document, measured nothing</td><td>gate is not a gate</td></tr>
+              <tr><td>field count</td><td>30 of 77 under the word "every"</td><td>claim exceeds measurement</td></tr>
+            </tbody>
+          </table>
+          <figcaption>The last column is the class of failure, which is the part that generalises.</figcaption>
+        </figure>
+
+        <h2 id="held">What withstood attack</h2>
+        <p>An audit is worth reading for what it couldn't break as well as what it could. These held:</p>
+        <ul>
+          <li>The causal graph localises all ten injected fault classes, by mutation testing.</li>
+          <li>Level start is bitwise identical across 64 lanes, by both memory comparison and reload.</li>
+          <li>The pin recomputes every digest from the files rather than trusting a stored verdict.</li>
+          <li>The throughput numbers reproduce within 2.32% when re-measured.</li>
+        </ul>
+
+        <h2 id="mechanism">The mechanism</h2>
+        <p>A verdict line contradicting its own table. A property satisfied by an exemption. A goal claiming more than its tools measured. Each had passed a test.</p>
+        <blockquote>The test and the claim were written by the same process, and the process checked that the test passed, not that the test measured the claim.</blockquote>
+        <p>That's the finding. It applies to agents and to people, and the remedy is structural: ask a separate party to refute the claim rather than confirm it, read the table instead of the verdict line, and keep every number attached to the condition it holds under. It's also why our <a href="projects.html#stages">project pages</a> label every result with a release stage.</p>
+
+        <p class="source">Adapted from <i>Running a Game Engine as Warp Kernels</i> (A. Mohan, draft report), section 8.</p>
+
+        <div class="article-foot mono">
+          <a href="research-rules-and-faults.html">← Previous: Rules declared once</a>
+          <a href="research-four-gpus.html">Next: Four GPUs, measured →</a>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <section class="cta slim">
+    <div class="wrap">
+      <footer class="mono">
+        <span>© 2026 Boulder Research</span>
+        <a href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+        <span class="portfolio-links">Portfolio: <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person</a> · <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware</a></span>
+        <span>Intelligence for interactive worlds</span>
+      </footer>
+    </div>
+  </section>
+</body>
+</html>

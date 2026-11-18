@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Investor materials — Boulder Research</title>
+  <meta name="description" content="Boulder Research investor briefs: drafts for discussion, kept separate from our research articles." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="projects.css" />
+  <link rel="stylesheet" href="research.css" />
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+    <nav class="nav">
+    <a href="index.html" class="brand" aria-label="Boulder Research home"></a>
+    <div class="nav-links mono">
+      <a href="index.html" class="hide-sm">Home</a>
+      <div class="nav-drop">
+        <a href="projects.html">Projects</a>
+        <button type="button" class="nav-drop-toggle" aria-expanded="false" aria-label="Show the Projects menu">▾</button>
+        <div class="nav-drop-menu">
+          <a href="project-warp-core.html">Warp Core</a>
+          <a href="project-miniloader.html">Miniloader</a>
+          <a href="project-astrolabe.html">Astrolabe</a>
+          <a href="research.html">Research</a>
+        </div>
+      </div>
+      <a href="investors.html" class="hide-sm" aria-current="page">Investors</a>
+      <a href="about.html" class="hide-sm">About</a>
+      <a class="btn" href="mailto:chris@kellogg.io?subject=Research">Get in touch</a>
+  </nav>
+  <script>
+  // T-439: a touchscreen has no hover, so the caret is a real button that
+  // pins the dropdown open on tap (the CSS reads .is-open). Hover still
+  // opens it for a mouse pointer.
+  (function () {
+    const drop = document.querySelector(".nav-drop");
+    const caret = drop && drop.querySelector(".nav-drop-toggle");
+    if (!caret) return;
+    caret.addEventListener("click", () => {
+      const open = drop.classList.toggle("is-open");
+      caret.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  })();
+  </script>
+
+  <header class="page-head">
+    <div class="wrap">
+      <div class="crumbs mono"><a href="index.html">Boulder Research</a> / Investor materials</div>
+      <span class="track-label mono">Investor track · Separate from research</span>
+      <h1>Investor<br><span class="serif">materials.</span></h1>
+      <p class="lede">These are fundraising documents: the round, the use of funds, milestones and team. They are <b>drafts for discussion</b>, and they contain plans and targets alongside measured results. The measured results, with the conditions they hold under, are written up in <a href="research.html">Research</a>.</p>
+    </div>
+  </header>
+
+  <!--
+    Investor track. Keep this page and the briefs it lists apart from the
+    research articles: research pages don't link here, and nothing here is
+    styled as an article. Each brief lists the research articles that carry
+    its technical content, so the two tracks stay in step.
+  -->
+  <section class="alt" id="briefs">
+    <div class="wrap">
+      <div class="sec-head mono"><span>Briefs</span><span>2 documents · Letter-size, printable</span></div>
+      <ul class="doc-list">
+        <li class="doc">
+          <div class="tag mono">Investor brief<span>Pre-seed · Oct 2026 · Draft</span></div>
+          <div>
+            <h3><a href="warp-core-brief.html">Warp Core: Thousands of worlds, one GPU at a time</a></h3>
+            <p>The measured GPU-simulation prototype: what's built, what it unlocks, the known limits and their fixes, the path beyond Godot, use of funds, milestones and team. Eight pages.</p>
+            <p class="reads">Technical detail in Research: <a href="research-engine-is-the-window.html">The engine is the window</a> · <a href="research-engine-as-kernels.html">The split moves</a> · <a href="research-rules-and-faults.html">Rules declared once</a> · <a href="research-two-audits.html">Two audits</a> · <a href="research-four-gpus.html">Four GPUs, measured</a> · <a href="research-gap-or-wall.html">A gap or a wall</a> · <a href="research-priced-per-copy.html">Priced per copy</a></p>
+          </div>
+        </li>
+        <li class="doc">
+          <div class="tag mono">Investor brief<span>Pre-seed · Oct 2026 · Draft</span></div>
+          <div>
+            <h3><a href="brief.html">Technical &amp; Investment Brief: Understand the world, leave the datacenter behind</a></h3>
+            <p>A world model is software that learns how an operation and its conditions respond when someone acts. The broader world-model thesis: why the datacenter is the default, four open problems, the first product, deployment tiers, use of funds, milestones and team. Seven pages.</p>
+            <p class="reads">Technical detail in Research: <a href="research-frame-is-not-a-token.html">A frame is not a token</a> · <a href="research-four-open-problems.html">Four open problems</a></p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="cta" id="contact">
+    <div class="wrap">
+      <h2>Want the<br><span class="serif">full report?</span></h2>
+      <p class="body">Ask for the technical report, a live demo, or the written summaries of either brief.</p>
+      <div class="ctas">
+        <a class="btn" href="mailto:chris@kellogg.io?subject=Investor%20materials">Start a conversation →</a>
+        <a class="btn ghost" href="research.html">Read the research</a>
+      </div>
+      <footer class="mono">
+        <span>© 2026 Boulder Research</span>
+        <a href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+        <span class="portfolio-links">Portfolio: <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person</a> · <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware</a></span>
+        <span>Intelligence for interactive worlds</span>
+      </footer>
+    </div>
+  </section>
+</body>
+</html>

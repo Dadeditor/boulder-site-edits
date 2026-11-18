@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 510" width="100%" role="img" aria-label="Cache growth per minute against card size">
+<style>text{font-family:ui-monospace,Consolas,monospace;color:#0b0b0c}.t{font-size:11px;fill:#3a3a3d}.s{font-size:9.5px}.m{fill:#75736d}.h{font-size:12px}</style>
+<text class="h" x="20" y="18">WHAT ONE MINUTE OF ROLLOUT WRITES · GB per minute, log scale</text>
+<text class="s" x="20" y="48">compressed video out</text>
+<rect x="180" y="38" width="17.02" height="12" fill="#2b4bff" opacity=".85"/>
+<text class="s b" x="203.02" y="48">0.14 GB/min</text>
+<text class="s m" x="180" y="62">0.1 MB per frame, 2.4 MB/s (Appendix A.3)</text>
+<text class="s" x="20" y="92">VAE latent stream</text>
+<rect x="180" y="82" width="88.35" height="12" fill="#2b4bff" opacity=".85"/>
+<text class="s b" x="274.35" y="92">0.66 GB/min</text>
+<text class="s m" x="180" y="106">0.46 MB per frame, 11.1 MB/s (Appendix A.3)</text>
+<text class="s" x="20" y="136">decoded raw pixels</text>
+<rect x="180" y="126" width="172.00" height="12" fill="#2b4bff" opacity=".85"/>
+<text class="s b" x="358.00" y="136">3.98 GB/min</text>
+<text class="s m" x="180" y="150">2.76 MB per frame, 66.2 MB/s (Appendix A.3)</text>
+<text class="s" x="20" y="180">KV cache, WorldKV figure</text>
+<rect x="180" y="170" width="354.86" height="12" fill="#ff3d2e" opacity=".85"/>
+<text class="s b" x="540.86" y="180">200.00 GB/min</text>
+<text class="s m" x="180" y="194">200 GB per minute, third party</text>
+<text class="s" x="20" y="224">KV cache, uncompressed bound</text>
+<rect x="180" y="214" width="398.53" height="12" fill="#ff3d2e" opacity=".85"/>
+<text class="s b" x="584.53" y="224">509.61 GB/min</text>
+<text class="s m" x="180" y="238">equation 9: 24 × 3,600 × 98,304 B/s</text>
+<text class="h" x="20" y="262">HOW LONG THE CACHE FITS ON A CARD · red at the uncompressed bound, blue at the WorldKV figure</text>
+<line x1="20" y1="274" x2="620" y2="274" stroke="#0b0b0c" stroke-width="1.5"/>
+<text class="s" x="20" y="295">Tier 0 target · 16 GB</text>
+<rect x="180" y="286" width="14.06" height="8" fill="#ff3d2e" opacity=".85"/>
+<rect x="180" y="296" width="35.83" height="8" fill="#2b4bff" opacity=".85"/>
+<text class="s m" x="200.06" y="294">1.9 s</text>
+<text class="s m" x="221.83" y="304">4.8 s</text>
+<text class="s" x="20" y="319">one R9700 · 32 GB</text>
+<rect x="180" y="310" width="28.13" height="8" fill="#ff3d2e" opacity=".85"/>
+<rect x="180" y="320" width="71.67" height="8" fill="#2b4bff" opacity=".85"/>
+<text class="s m" x="214.13" y="318">3.8 s</text>
+<text class="s m" x="257.67" y="328">9.6 s</text>
+<text class="s" x="20" y="343">H100 (Tier 2) · 80 GB</text>
+<rect x="180" y="334" width="70.32" height="8" fill="#ff3d2e" opacity=".85"/>
+<rect x="180" y="344" width="179.17" height="8" fill="#2b4bff" opacity=".85"/>
+<text class="s m" x="256.32" y="342">9.4 s</text>
+<text class="s m" x="365.17" y="352">24.0 s</text>
+<text class="s" x="20" y="367">Tier 1 aggregate · 112 GB</text>
+<rect x="180" y="358" width="98.44" height="8" fill="#ff3d2e" opacity=".85"/>
+<rect x="180" y="368" width="250.83" height="8" fill="#2b4bff" opacity=".85"/>
+<text class="s m" x="284.44" y="366">13.2 s</text>
+<text class="s m" x="436.83" y="376">33.6 s</text>
+<text class="s" x="20" y="391">H200 (Tier 2) · 141 GB</text>
+<rect x="180" y="382" width="123.93" height="8" fill="#ff3d2e" opacity=".85"/>
+<rect x="180" y="392" width="315.78" height="8" fill="#2b4bff" opacity=".85"/>
+<text class="s m" x="309.93" y="390">16.6 s</text>
+<text class="s m" x="501.78" y="400">42.3 s</text>
+<text class="s" x="20" y="415">B200 (Tier 2) · 192 GB</text>
+<rect x="180" y="406" width="168.76" height="8" fill="#ff3d2e" opacity=".85"/>
+<rect x="180" y="416" width="430.00" height="8" fill="#2b4bff" opacity=".85"/>
+<text class="s m" x="354.76" y="414">22.6 s</text>
+<text class="s m" x="616.00" y="424">57.6 s</text>
+<text class="t s" x="20" y="442">No card holds a minute. At the reference geometry the cache grows 510 GB per minute, so the </text>
+<text class="t s" x="20" y="456">biggest card here buys 23 s of rollout at that rate, 58 at the WorldKV figure.</text>
+<text class="s m" x="20" y="470">Source: docs/main.pdf Appendix A (1280x720, 24 fps, 24 layers x 1024 wide, bf16 latents); </text>
+<text class="s m" x="20" y="483">tier ladder from the Investor Summary. H100, H200 and B200 capacities are published vendor </text>
+<text class="s m" x="20" y="496">figures, not measurements in this repository.</text>
+</svg>

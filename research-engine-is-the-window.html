@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The engine is the window. — Boulder Research</title>
+  <meta name="description" content="A plain-language primer on the Warp Core demo: a ball, a door, and 4,096 copies of the same small game stepping at once on a GPU, with Godot drawing one of them." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="projects.css" />
+  <link rel="stylesheet" href="research.css" />
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+    <nav class="nav">
+    <a href="index.html" class="brand" aria-label="Boulder Research home"></a>
+    <div class="nav-links mono">
+      <a href="index.html" class="hide-sm">Home</a>
+      <div class="nav-drop">
+        <a href="projects.html">Projects</a>
+        <button type="button" class="nav-drop-toggle" aria-expanded="false" aria-label="Show the Projects menu">▾</button>
+        <div class="nav-drop-menu">
+          <a href="project-warp-core.html">Warp Core</a>
+          <a href="project-miniloader.html">Miniloader</a>
+          <a href="project-astrolabe.html">Astrolabe</a>
+          <a href="research.html" aria-current="page">Research</a>
+        </div>
+      </div>
+      <a href="investors.html" class="hide-sm">Investors</a>
+      <a href="about.html" class="hide-sm">About</a>
+      <a class="btn" href="mailto:chris@kellogg.io?subject=Research">Get in touch</a>
+  </nav>
+  <script>
+  // T-439: a touchscreen has no hover, so the caret is a real button that
+  // pins the dropdown open on tap (the CSS reads .is-open). Hover still
+  // opens it for a mouse pointer.
+  (function () {
+    const drop = document.querySelector(".nav-drop");
+    const caret = drop && drop.querySelector(".nav-drop-toggle");
+    if (!caret) return;
+    caret.addEventListener("click", () => {
+      const open = drop.classList.toggle("is-open");
+      caret.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  })();
+  </script>
+
+  <header class="article-head">
+    <div class="wrap">
+      <div class="crumbs mono"><a href="index.html">Boulder Research</a> / <a href="research.html">Research</a> / Simulation architecture</div>
+      <h1>The engine is the window.<br><span class="serif">Thousands of worlds behind it.</span></h1>
+      <p class="dek">A ball, a door, and 4,096 copies of the same small game running at once. A primer on our live demo, written so you can follow it without a graphics background.</p>
+      <div class="byline mono">
+        <span><b>Boulder Research</b></span>
+        <time datetime="2026-11-10">10 November 2026</time>
+        <span>Simulation architecture · Primer</span>
+        <span>~5 min read</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="article-body">
+      <aside class="toc mono" aria-label="Contents">
+        <span>Contents</span>
+        <ol>
+          <li><a href="#looking">What you're looking at</a></li>
+          <li><a href="#gpu">Why a graphics card</a></li>
+          <li><a href="#parts">The gym, the scoreboard, the window</a></li>
+          <li><a href="#cheating">How we know it isn't cheating</a></li>
+          <li><a href="#why">Why bother</a></li>
+          <li><a href="#sentence">The one sentence</a></li>
+        </ol>
+      </aside>
+
+      <article class="prose">
+        <p>The demo looks unremarkable: an orange ball drops, bounces, rolls toward a door, and the door opens. What's unusual is where the ball's motion comes from, and how many other balls you can't see.</p>
+
+        <h2 id="looking">The ball is real physics. Godot is just the TV.</h2>
+        <p>In a normal game, Godot does everything. It moves the ball, checks whether it hit the door, and then draws the picture. In this demo Godot does only the last job. The moving happens somewhere else, on the graphics card, for thousands of copies of the same scene at the same time.</p>
+        <p>The numbers in the corner of the window aren't Godot's guesses. They are copied from world number 0's memory: the tick, the position, the speed, whether the door is open.</p>
+        <div class="callout"><span class="mono">The picture to keep in mind</span>Think of 4,096 game consoles sharing one cartridge. Each console has its own save file. Godot is the TV plugged into console zero.</div>
+
+        <h2 id="gpu">Why a graphics card</h2>
+        <p>A regular processor is like one very good teacher: great at one hard problem at a time. A graphics card is like a gym full of desks: great at the same easy problem many times at once. That's how it draws millions of pixels. We used the same trick on a whole game step instead of a pixel.</p>
+        <p>The floor, the door's shape and the size of the ball never change. Those are the cartridge: stored once and read by every copy. What does change (where the ball is, how fast it's going, whether this copy of the door has opened) is a small save file per world. Adding another world doesn't mean copying the whole engine. It means adding another save file, about 10 KB of it.</p>
+
+        <h2 id="parts">The gym, the scoreboard, the window</h2>
+        <p>The demo has three parts:</p>
+        <ul>
+          <li><b>The gym.</b> The graphics card runs the rules (gravity, bounce, "is the ball near the door?") for all 4,096 worlds at once.</li>
+          <li><b>The scoreboard.</b> Results are written into a shared block of memory. A counter ticks up only when a full step is finished, so the picture never shows a half-written answer.</li>
+          <li><b>The window.</b> Godot reads console 0 and draws the ball and the door. It doesn't simulate anything. Unplug the gym and the window freezes.</li>
+        </ul>
+
+        <h2 id="cheating">How we know it isn't cheating</h2>
+        <p>Anyone can make a pretty demo. This one has to survive a test that tries to break it. The test works like three calculators given the same sum:</p>
+        <ol>
+          <li><b>Write each rule once.</b> For example, "each step, pull the ball down by gravity", together with exactly which numbers it reads and which it writes.</li>
+          <li><b>Compile it three ways:</b> onto the graphics card, into ordinary Python as the answer key, and into Godot's own scripting language.</li>
+          <li><b>Check they match.</b> After 120 steps, every number the rules touch is identical on all three, bit for bit. Then we plant bugs on purpose (a bounce that's too bouncy, a door that never opens) and check that the system points to the exact number that went wrong.</li>
+        </ol>
+        <p>The full version of that machinery, and what "identical" does and doesn't cover, is the subject of <a href="research-rules-and-faults.html">Rules declared once</a>.</p>
+
+        <h2 id="why">Why bother</h2>
+        <p>Finding a bug, or training an AI, takes many tries. A person plays one game at a time. A robot player usually needs one full copy of the engine per try, which is slow and expensive. If thousands of tries fit on one card, you can hunt rare crashes, try every fork in the road, or produce clean practice data for an AI that's learning how a world works.</p>
+        <figure class="table">
+          <table>
+            <thead><tr><th>Figure</th><th>Value</th><th>Condition</th></tr></thead>
+            <tbody>
+              <tr><td>Copies stepping together</td><td class="n">4,096</td><td>you watch one; the rest keep playing in the same launch</td></tr>
+              <tr><td>World-steps per second</td><td class="n">5.05M</td><td>four-GPU lab machine, this same small scene</td></tr>
+              <tr><td>Half-written pictures</td><td class="n">0 of 10,000</td><td>reads of the live scoreboard while it was being written</td></tr>
+            </tbody>
+          </table>
+          <figcaption>Measured on a deliberately minimal scene (one physics body, a door, a trigger zone). It shows the architecture works. It is not a number for a shipping game.</figcaption>
+        </figure>
+
+        <h2 id="sentence">The one sentence</h2>
+        <blockquote>The engine is no longer the world. The engine is the window you watch one world through.</blockquote>
+        <p>That's the idea behind <a href="project-warp-core.html">Warp Core</a>. Its built-in verification harness makes it checkable: one set of rules, three backends, a live Godot window, and tests that catch the bugs we plant. The demo is the smallest honest picture of it.</p>
+        <p>The next piece, <a href="research-engine-as-kernels.html">The engine can't go in the kernel</a>, explains why the split has to fall exactly here, and what it costs.</p>
+
+        <p class="source">Adapted from our Warp Core demo explainer. Figures are from <i>Running a Game Engine as Warp Kernels</i> (A. Mohan, draft report), measured on the same scene.</p>
+
+        <div class="article-foot mono">
+          <a href="research-four-open-problems.html">← Previous: Four open problems</a>
+          <a href="research-engine-as-kernels.html">Next: The split moves →</a>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <section class="cta slim">
+    <div class="wrap">
+      <footer class="mono">
+        <span>© 2026 Boulder Research</span>
+        <a href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+        <span class="portfolio-links">Portfolio: <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person</a> · <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware</a></span>
+        <span>Intelligence for interactive worlds</span>
+      </footer>
+    </div>
+  </section>
+</body>
+</html>

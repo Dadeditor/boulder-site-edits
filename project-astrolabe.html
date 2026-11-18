@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Astrolabe — Boulder Research</title>
+  <meta name="description" content="Astrolabe is a hosted subscription agent service at astrolabe.miniloader.ai: always-on assistants in Slack, email, calendar, files and GitHub. An adjacent product to Boulder Research, not a research project." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="projects.css" />
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+    <nav class="nav">
+    <a href="index.html" class="brand" aria-label="Boulder Research home"></a>
+    <div class="nav-links mono">
+      <a href="index.html" class="hide-sm">Home</a>
+      <div class="nav-drop">
+        <a href="projects.html">Projects</a>
+        <button type="button" class="nav-drop-toggle" aria-expanded="false" aria-label="Show the Projects menu">▾</button>
+        <div class="nav-drop-menu">
+          <a href="project-warp-core.html">Warp Core</a>
+          <a href="project-miniloader.html">Miniloader</a>
+          <a href="project-astrolabe.html" aria-current="page">Astrolabe</a>
+          <a href="research.html">Research</a>
+        </div>
+      </div>
+      <a href="investors.html" class="hide-sm">Investors</a>
+      <a href="about.html" class="hide-sm">About</a>
+      <a class="btn" href="mailto:chris@kellogg.io?subject=Research">Get in touch</a>
+  </nav>
+  <script>
+  // T-439: a touchscreen has no hover, so the caret is a real button that
+  // pins the dropdown open on tap (the CSS reads .is-open). Hover still
+  // opens it for a mouse pointer.
+  (function () {
+    const drop = document.querySelector(".nav-drop");
+    const caret = drop && drop.querySelector(".nav-drop-toggle");
+    if (!caret) return;
+    caret.addEventListener("click", () => {
+      const open = drop.classList.toggle("is-open");
+      caret.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  })();
+  </script>
+
+  <header class="page-head">
+    <div class="wrap">
+      <div class="crumbs mono"><a href="index.html">Boulder Research</a> / <a href="projects.html">Projects</a> / Astrolabe</div>
+      <p class="ship-note mono"><b>Adjacent product.</b> Ships today; not a Boulder Research research project.</p>
+      <div class="status-bar mono">
+        <span class="status">Hosted service · Live portal</span>
+        <span class="tag">Hosted subscription</span><span class="tag">Runs on the Hermes agent stack</span>
+      </div>
+      <h1>Astrolabe.<br><span class="serif">Agents that work where you work.</span></h1>
+      <p class="lede">Astrolabe is a <b>hosted, subscription agent service</b>: always-on assistants for messaging and productivity tools. It is an <b>adjacent hosted product, not a Boulder Research research project</b>.</p>
+      <div class="ctas">
+        <a class="btn" href="https://astrolabe.miniloader.ai" target="_blank" rel="noopener">Visit astrolabe.miniloader.ai ↗</a>
+        <a class="btn ghost" href="#relationship">How it relates</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="alt" id="what">
+    <div class="wrap">
+      <div class="sec-head mono"><span>01 / What it is</span><span>Hosted agents</span></div>
+      <div class="split">
+        <div>
+          <h2>Assistants that<br><span class="serif">stay on.</span></h2>
+          <p class="body">Astrolabe agents live in Slack (DMs, channels and threads) and work across your email, calendar, files and code. They keep memory, run scheduled jobs and have their own sandboxed computer.</p>
+        </div>
+        <div class="features">
+          <div><span class="mono">Messaging</span><p>Slack DMs, channels and threads.</p></div>
+          <div><span class="mono">Email &amp; calendar</span><p>Gmail, Google Calendar, Contacts and Outlook.</p></div>
+          <div><span class="mono">Files</span><p>Google Drive, OneDrive and Dropbox.</p></div>
+          <div><span class="mono">Code</span><p>GitHub commits, pushes and pull requests.</p></div>
+        </div>
+      </div>
+      <p class="body" style="margin-top:28px">It connects to Claude, ChatGPT, Slack, Microsoft 365, Google Workspace, GitHub, Dropbox and the Nous Research Hermes agent, and runs on the Hermes agent stack.</p>
+    </div>
+  </section>
+
+  <section id="status">
+    <div class="wrap">
+      <div class="sec-head mono"><span>02 / Status</span><span>Updated November 2026</span></div>
+      <div class="split">
+        <h2>Working product.<br><span class="serif">Early days.</span></h2>
+        <p class="body">Signup, Stripe billing and prepaid API keys work. Pricing on the site is $8.99/month for the first three months, then $14.99/month. The live portal is at <a href="https://astrolabe.miniloader.ai" target="_blank" rel="noopener">astrolabe.miniloader.ai</a>, a staging domain; there is no standalone production domain yet. We make no claims about customers or traction.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt" id="relationship">
+    <div class="wrap">
+      <div class="sec-head mono"><span>03 / How it relates to Boulder Research</span><span>Stated plainly</span></div>
+      <div class="split">
+        <h2>Adjacent,<br><span class="serif">not a research project.</span></h2>
+        <p class="body">Astrolabe is the hosted counterpart to <a href="project-miniloader.html">Miniloader</a>, which runs locally on your own hardware. Both are built on the same agent stack. Miniloader is a Boulder Research research project that ships; Astrolabe is a separate hosted product beside it.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta" id="contact">
+    <div class="wrap">
+      <h2>Put agents<br><span class="serif">where you work.</span></h2>
+      <p class="body">Try the live portal, or write to us with questions.</p>
+      <div class="ctas">
+        <a class="btn" href="https://astrolabe.miniloader.ai" target="_blank" rel="noopener">Visit Astrolabe ↗</a>
+        <a class="btn ghost" href="projects.html">All projects</a>
+      </div>
+      <footer class="mono">
+        <span>© 2026 Boulder Research</span>
+        <a href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+        <span class="portfolio-links">Portfolio: <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person</a> · <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware</a></span>
+        <span>Astrolabe · Hosted service</span>
+      </footer>
+    </div>
+  </section>
+</body>
+</html>

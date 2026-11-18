@@ -1,0 +1,1391 @@
+<!doctype html>
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boulder site edits</title>
+  <meta name="description" content="Boulder Research builds warp pipelines that run thousands of simulated operations and conditions at once on a GPU, and anomaly detection models trained on them, for robotics, games, industrial systems, and security.">
+  <!-- T-480: the home page is the domain root only; index.html at the root is
+       the same object, and /home.html redirects here. -->
+  <link rel="canonical" href="https://boulderresearch.ai/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&amp;family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #efede7;
+      --paper-2: #e6e3db;
+      --ink: #0b0b0c;
+      --ink-2: #3a3a3d;
+      --muted: #75736d;
+      --rule: rgba(11, 11, 12, .14);
+      --predict: #2b4bff;
+      --fault: #ff3d2e;
+      --display: "Archivo", "Arial Narrow", sans-serif;
+      --serif: "Instrument Serif", Georgia, serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --pad: clamp(20px, 4vw, 64px);
+      color-scheme: light;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--display);
+      font-variation-settings: "wdth" 100;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 200;
+      opacity: .22;
+      mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .35 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    a { color: inherit; }
+    canvas { display: block; }
+
+    .mono { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+    .serif { font-family: var(--serif); font-weight: 400; }
+    .blue { color: var(--predict); }
+
+    /* ---------- NAV ---------- */
+    .nav {
+      position: fixed;
+      z-index: 50;
+      top: 0; left: 0; right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px var(--pad);
+      transition: background .3s, border-color .3s;
+      border-bottom: 1px solid transparent;
+    }
+    .nav.scrolled {
+      background: rgba(239, 237, 231, .86);
+      backdrop-filter: blur(14px);
+      border-color: var(--rule);
+    }
+    .brand {
+      display: block;
+      width: 84px;
+      aspect-ratio: 1081 / 700;
+      background: url("logo-ink.png") no-repeat center / contain;
+    }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links > a { text-decoration: none; color: var(--ink-2); }
+    .nav-links > a:hover { color: var(--ink); }
+    /* Projects dropdown: the product pages, and the research that feeds them. */
+    .nav-drop { position: relative; display: flex; align-items: center; }
+    .nav-drop > a { text-decoration: none; color: var(--ink-2); }
+    .nav-drop > a:hover { color: var(--ink); }
+    /* T-439: same caret-as-a-button toggle as projects.css. A touchscreen has
+       no hover, so tapping it pins the dropdown open. */
+    .nav-drop-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      margin-left: 8px;
+      padding: 0;
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .nav-drop-toggle:hover, .nav-drop-toggle:focus-visible { color: var(--ink); border-color: var(--ink); }
+    .nav-drop.is-open .nav-drop-toggle { color: var(--ink); transform: rotate(180deg); }
+    .nav-drop-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 0;
+      min-width: 210px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 12px 14px;
+      margin-top: 0;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      box-shadow: 0 12px 28px rgba(11, 11, 12, .12);
+      opacity: 0;
+      transform: translateY(-6px);
+      visibility: hidden;
+      /* short close delay so a slightly off-axis pointer path does not drop the menu */
+      transition: opacity .18s ease .2s, transform .18s ease .2s, visibility 0s linear .38s;
+    }
+    /* invisible bridge over the gap below the Projects link: hover stays on the menu */
+    .nav-drop-menu::before { content: ""; position: absolute; left: 0; right: 0; top: -12px; height: 12px; }
+    .nav-drop-menu a { text-decoration: none; color: var(--ink-2); }
+    .nav-drop-menu a:hover { color: var(--ink); }
+    /* hover for a mouse pointer, .is-open for a tap (or Enter) on the caret */
+    .nav-drop:hover .nav-drop-menu, .nav-drop.is-open .nav-drop-menu { opacity: 1; transform: none; pointer-events: auto; visibility: visible; transition-delay: 0s; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      border: 1.5px solid var(--ink);
+      background: var(--ink);
+      color: var(--paper) !important;
+      text-decoration: none;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      transition: transform .2s, background .2s, color .2s;
+    }
+    .btn:hover { transform: translate(-2px, -2px); box-shadow: 3px 3px 0 var(--predict); }
+    .btn.ghost { background: transparent; color: var(--ink) !important; }
+    .btn .arrow { transition: transform .2s; }
+    .btn:hover .arrow { transform: translateX(3px); }
+
+    /* ---------- HERO ---------- */
+    .hero {
+      position: relative;
+      min-height: max(100vh, 680px);
+      display: flex;
+      align-items: flex-end;
+      box-sizing: border-box;
+      /* top padding reserves the fixed nav/logo strip so hero copy can never slide under it */
+      padding: 120px var(--pad) clamp(40px, 9vh, 96px);
+      overflow: hidden;
+      cursor: crosshair;
+    }
+    #world { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .hero-copy {
+      position: relative;
+      width: min(660px, 100%);
+      pointer-events: none;
+    }
+    .hero-copy > * { pointer-events: auto; }
+    .eyebrow { display: flex; align-items: center; gap: 12px; color: var(--ink-2); margin-bottom: 22px; }
+    .eyebrow::before { content: ""; width: 28px; height: 1.5px; background: var(--ink); }
+    h1 {
+      margin: 0;
+      font-size: clamp(58px, 8.6vw, 142px);
+      line-height: .86;
+      font-weight: 850;
+      font-variation-settings: "wdth" 72;
+      text-transform: uppercase;
+      letter-spacing: -.01em;
+    }
+    h1 .serif { text-transform: none; font-style: italic; font-weight: 400; letter-spacing: -.02em; font-size: 1.04em; }
+    .lede {
+      margin: 26px 0 30px;
+      max-width: 520px;
+      font-size: clamp(17px, 1.35vw, 20px);
+      line-height: 1.5;
+      color: var(--ink-2);
+      font-variation-settings: "wdth" 96;
+    }
+    .lede b { color: var(--ink); font-weight: 650; }
+    .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+
+    .hud {
+      position: absolute;
+      right: var(--pad);
+      top: 104px;
+      width: 260px;
+      padding: 16px 18px;
+      border: 1px solid var(--rule);
+      background: rgba(239, 237, 231, .72);
+      backdrop-filter: blur(6px);
+      pointer-events: none;
+    }
+    .hud-row { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px dashed var(--rule); }
+    .hud-row:last-of-type { border-bottom: 0; }
+    .hud-row span:first-child { color: var(--muted); }
+    .hud-bar { height: 3px; background: var(--paper-2); margin: 2px 0 8px; position: relative; overflow: hidden; }
+    .hud-bar i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--predict); transition: width .15s linear; }
+    .legend { margin-top: 12px; display: grid; gap: 7px; color: var(--ink-2); }
+    .legend div { display: flex; align-items: center; gap: 10px; }
+    .sw { width: 22px; height: 0; border-top: 3px solid var(--ink); }
+    .sw.p { border-top: 1px solid var(--predict); box-shadow: 0 3px 0 -2px var(--predict), 0 -3px 0 -2px var(--predict); }
+    .sw.a { width: 10px; height: 10px; border: 1.5px solid var(--predict); border-radius: 50%; margin: 0 6px; }
+    .hint {
+      position: absolute;
+      right: var(--pad);
+      bottom: clamp(40px, 9vh, 96px);
+      color: var(--ink-2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .hint i { width: 18px; height: 18px; border: 1.5px solid var(--ink); border-radius: 50%; position: relative; }
+    .hint i::after { content: ""; position: absolute; inset: 5px; background: var(--ink); border-radius: 50%; animation: pulse 1.8s infinite; }
+    @keyframes pulse { 50% { transform: scale(.4); opacity: .4; } }
+    .webgl-fallback .hud, .webgl-fallback .hint { display: none; }
+
+    /* ---------- SECTIONS ---------- */
+    section { position: relative; }
+    .wrap { padding: 0 var(--pad); max-width: 1440px; margin: 0 auto; }
+    .sec-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 18px 0;
+      border-top: 1.5px solid var(--ink);
+      color: var(--ink-2);
+    }
+    h2 {
+      margin: 0;
+      font-size: clamp(44px, 6vw, 96px);
+      line-height: .9;
+      font-weight: 850;
+      font-variation-settings: "wdth" 72;
+      text-transform: uppercase;
+      letter-spacing: -.005em;
+    }
+    h2 .serif { text-transform: none; font-style: italic; font-size: 1.05em; letter-spacing: -.02em; }
+    h3 {
+      margin: 0 0 10px;
+      font-size: 28px;
+      font-weight: 800;
+      font-variation-settings: "wdth" 78;
+      text-transform: uppercase;
+    }
+    p.body { font-size: 17px; line-height: 1.6; color: var(--ink-2); margin: 0; max-width: 560px; }
+
+    /* ---------- TRANSLATE ---------- */
+    .translate { height: 620vh; }
+    .translate-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-top: 84px;
+    }
+    .translate-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: clamp(28px, 5vw, 96px);
+      align-items: center;
+    }
+    .jargon-label { color: var(--muted); margin-bottom: 20px; display: flex; gap: 14px; }
+    .jargon {
+      margin: 0;
+      font-size: clamp(30px, 3.5vw, 58px);
+      line-height: 1.12;
+      font-weight: 500;
+      font-variation-settings: "wdth" 88;
+      letter-spacing: -.01em;
+      color: rgba(11, 11, 12, .32);
+    }
+    .jargon .ph {
+      position: relative;
+      color: rgba(11, 11, 12, .32);
+      transition: color .4s;
+      background-image: linear-gradient(var(--predict), var(--predict));
+      background-repeat: no-repeat;
+      background-size: 0% 3px;
+      background-position: 0 92%;
+      transition: color .4s, background-size .6s cubic-bezier(.2, .8, .2, 1);
+    }
+    .jargon .ph.seen { color: var(--ink); background-size: 100% 1.5px; background-image: linear-gradient(var(--ink), var(--ink)); }
+    .jargon .ph.on { color: var(--ink); background-size: 100% 4px; }
+    .jargon .ph sup { position: absolute; right: -9px; top: -2px; font-family: var(--mono); font-size: 11px; line-height: 1; color: var(--predict); opacity: 0; transition: opacity .3s; }
+    .jargon .ph.on sup, .jargon .ph.seen sup { opacity: 1; }
+    .decode { position: relative; min-height: 360px; }
+    .card {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .45s, transform .45s cubic-bezier(.2, .8, .2, 1);
+      pointer-events: none;
+    }
+    .card.active { opacity: 1; transform: none; pointer-events: auto; }
+    .card .mono { color: var(--predict); display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .card .mono b { color: var(--ink); font-weight: 600; }
+    .card .big {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(48px, 5vw, 84px);
+      line-height: .95;
+      margin: 0 0 22px;
+      letter-spacing: -.02em;
+    }
+    .card p { font-size: 18px; line-height: 1.6; color: var(--ink-2); margin: 0; max-width: 470px; }
+    .card p b { color: var(--ink); font-weight: 650; }
+    .card.summary .big { font-style: normal; font-family: var(--display); font-weight: 850; font-variation-settings: "wdth" 72; text-transform: uppercase; font-size: clamp(40px, 4vw, 66px); line-height: .92; }
+    .card.summary .big em { font-family: var(--serif); font-weight: 400; text-transform: none; color: var(--predict); }
+    .progress { height: 2px; background: var(--rule); margin: 0 0 28px; }
+    .progress i { display: block; height: 100%; background: var(--ink); transform-origin: left; transform: scaleX(0); }
+
+    /* ---------- DRIFT ---------- */
+    .drift { padding: 120px 0 140px; background: var(--paper-2); }
+    .drift-intro { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: end; margin: 40px 0 56px; }
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+    .panel { border: 1.5px solid var(--ink); background: var(--paper); }
+    .panel-top { display: flex; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--rule); }
+    .panel-top .tag { display: inline-flex; align-items: center; gap: 8px; }
+    .panel-top .tag::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--fault); }
+    .panel.good .panel-top .tag::before { background: var(--predict); }
+    .panel canvas.scene { width: 100%; aspect-ratio: 16 / 7.2; }
+    .panel canvas.spark { width: 100%; height: 64px; border-top: 1px solid var(--rule); }
+    .panel-foot { display: flex; justify-content: space-between; padding: 10px 14px; color: var(--muted); border-top: 1px solid var(--rule); }
+
+    /* ---------- TECHNOLOGY ---------- */
+    .tech { padding: 120px 0; }
+    .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 56px; }
+    .tech-card { border: 1.5px solid var(--ink); background: var(--paper); display: flex; flex-direction: column; }
+    .tech-card canvas { width: 100%; height: 220px; border-bottom: 1px solid var(--rule); background: rgba(255,255,255,.25); }
+    .tech-card .inner { padding: 26px 28px 22px; display: flex; flex-direction: column; flex: 1; }
+    .tech-card .mono { color: var(--muted); margin-bottom: 14px; }
+    .tech-card .who { font-family: var(--serif); font-style: italic; font-size: 22px; color: var(--predict); margin: -4px 0 14px; }
+    .tech-card p { font-size: 16px; line-height: 1.6; color: var(--ink-2); margin: 0 0 18px; max-width: 560px; }
+    .tech-card .stat { margin-top: auto; padding-top: 16px; border-top: 1px dashed var(--rule); display: flex; justify-content: space-between; gap: 16px; color: var(--ink-2); }
+    .loop { display: grid; grid-template-columns: auto repeat(3, 1fr); gap: 0; margin-top: 28px; border-top: 1.5px solid var(--ink); }
+    .loop > div { padding: 22px 28px 8px 0; }
+    .loop .loop-title { padding-right: 48px; color: var(--ink-2); }
+    .loop .mono.n { color: var(--predict); margin-bottom: 10px; }
+    .loop b { display: block; font-size: 20px; font-weight: 800; font-variation-settings: "wdth" 80; text-transform: uppercase; margin-bottom: 6px; }
+    .loop p { margin: 0; color: var(--ink-2); font-size: 15px; line-height: 1.55; }
+
+    /* ---------- CONCEPT: LIGHTNING IN GLASS ---------- */
+    .concept { padding: 120px 0; background: var(--paper-2); }
+    .concept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; margin-top: 40px; align-items: center; }
+    .concept h2 { font-size: clamp(40px, 5vw, 80px); }
+    .concept p.body { margin-top: 24px; }
+    .concept-key { margin-top: 32px; border-top: 1.5px solid var(--ink); }
+    .concept-key > div { display: grid; grid-template-columns: 96px 1fr; gap: 16px; padding: 14px 0; border-bottom: 1px dashed var(--rule); align-items: baseline; }
+    .concept-key .mono { color: var(--predict); }
+    .concept-key p { margin: 0; font-size: 15.5px; line-height: 1.5; color: var(--ink-2); }
+    .concept-note { margin-top: 22px; color: var(--muted); max-width: 560px; line-height: 1.6; }
+    .glass { border: 1.5px solid var(--ink); background: var(--paper); }
+    .glass canvas { display: block; width: 100%; aspect-ratio: 5 / 5.6; }
+
+    /* ---------- PROOF (dark) ---------- */
+    .proof { background: var(--ink); color: var(--paper); padding: 120px 0 130px; }
+    .proof .sec-head { border-color: var(--paper); color: rgba(239,237,231,.6); }
+    .proof p.body { color: rgba(239,237,231,.72); }
+    .proof-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 40px; margin-top: 56px; align-items: start; }
+    .video-frame { position: relative; border: 1px solid rgba(239,237,231,.25); background: #000; }
+    .video-frame video { display: block; width: 100%; aspect-ratio: 4/3; object-fit: contain; background: #000; }
+    .video-frame .cap { display: flex; justify-content: space-between; padding: 12px 14px; border-top: 1px solid rgba(239,237,231,.18); color: rgba(239,237,231,.6); }
+    .video-frame .rec { color: #8fa3ff; display: inline-flex; gap: 8px; align-items: center; }
+    .video-frame .rec::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #8fa3ff; }
+    .steps { border-top: 1.5px solid var(--paper); }
+    .step { padding: 22px 0 24px; border-bottom: 1px solid rgba(239,237,231,.18); }
+    .step .mono { display: flex; justify-content: space-between; color: rgba(239,237,231,.5); margin-bottom: 10px; }
+    .step .mono b { font-weight: 600; color: #8fa3ff; }
+    .step.now .mono b { color: var(--paper); }
+    .step h3 { font-size: 30px; margin-bottom: 10px; }
+    .step p { margin: 0; color: rgba(239,237,231,.72); font-size: 15.5px; line-height: 1.6; }
+    .step a { color: #8fa3ff; }
+    .proof-figs { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 64px; border-top: 1px solid rgba(239,237,231,.2); }
+    .pf { padding: 26px 24px 0 0; }
+    .pf .n { font-size: clamp(40px, 4vw, 64px); font-weight: 850; font-variation-settings: "wdth" 70; line-height: 1; }
+    .pf .n small { font-size: .42em; font-weight: 700; margin-left: 4px; }
+    .pf p { margin: 10px 0 0; color: rgba(239,237,231,.66); font-size: 14.5px; line-height: 1.5; }
+    .proof-note { margin-top: 36px; color: rgba(239,237,231,.42); }
+    .proof-note a { color: rgba(239,237,231,.75); }
+
+    /* ---------- PRODUCTS ---------- */
+    .products { padding: 120px 0; background: var(--paper-2); }
+    .prod-grid { display: grid; grid-template-columns: repeat(4, 1fr); border-left: 1px solid var(--rule); margin-top: 56px; }
+    .prod { border-right: 1px solid var(--rule); padding: 0 24px 8px; display: flex; flex-direction: column; }
+    .prod .mono.num { color: var(--muted); padding-top: 18px; border-top: 1.5px solid var(--ink); margin: 0 -24px 18px; padding-left: 24px; }
+    .prod h3 { font-size: 26px; line-height: 1; }
+    .prod .who { font-family: var(--serif); font-style: italic; font-size: 20px; color: var(--predict); margin: 2px 0 14px; }
+    .prod p { font-size: 15.5px; line-height: 1.6; color: var(--ink-2); margin: 0 0 18px; }
+    .uses { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+    .uses span { padding: 4px 7px; border: 1px solid var(--rule); color: var(--muted); font-size: 10px; }
+    .uses span.on { border-color: var(--predict); color: var(--predict); }
+    .prod .today { margin-top: auto; padding-top: 14px; border-top: 1px dashed var(--rule); font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+    .prod .today .mono { display: block; color: var(--muted); font-size: 10px; margin-bottom: 6px; }
+    .proj-link { display: inline-block; margin-top: 10px; color: var(--predict); text-decoration: none; }
+    .proj-link:hover { text-decoration: underline; }
+
+    /* ---------- TEAM ---------- */
+    .team { padding: 120px 0; }
+    .people { display: grid; grid-template-columns: repeat(2, 1fr); gap: 48px 28px; margin-top: 48px; }
+    .portfolio { padding: 100px 0 60px; }
+    .portfolio p.body { margin-top: 26px; max-width: 720px; }
+    .portfolio .sites { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 26px; }
+    .portfolio .sites a { text-decoration: none; color: var(--predict); }
+    .person { border-top: 1.5px solid var(--ink); padding-top: 22px; }
+    .person h4 { margin: 0; font-size: 34px; font-weight: 850; font-variation-settings: "wdth" 74; text-transform: uppercase; }
+    .person .role { font-family: var(--serif); font-style: italic; font-size: 21px; color: var(--predict); margin: 4px 0 16px; }
+    .person ul { margin: 0; padding: 0; list-style: none; }
+    .person li { padding: 10px 0 10px 22px; border-bottom: 1px dashed var(--rule); position: relative; color: var(--ink-2); line-height: 1.5; font-size: 15.5px; }
+    .person li::before { content: "→"; position: absolute; left: 0; font-family: var(--mono); color: var(--muted); }
+    .person .links { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 14px; }
+    .person .site { display: inline-block; color: var(--predict); }
+
+    /* ---------- CTA ---------- */
+    .cta { background: var(--ink); color: var(--paper); padding: 110px 0 40px; overflow: hidden; }
+    .cta-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 48px; align-items: center; }
+    .cta h2 { font-size: clamp(52px, 7vw, 120px); }
+    .cta h2 .serif { color: #8fa3ff; }
+    .cta p.body { color: rgba(239,237,231,.7); margin: 24px 0 32px; }
+    .cta .btn { background: var(--paper); color: var(--ink) !important; border-color: var(--paper); }
+    .cta .btn.ghost { background: transparent; color: var(--paper) !important; }
+    .logo-dark { width: 100%; max-width: 440px; justify-self: end; }
+    footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-top: 90px; padding-top: 22px; border-top: 1px solid rgba(239,237,231,.2); color: rgba(239,237,231,.5); }
+    footer a { color: inherit; }
+    footer .portfolio-links a { text-decoration: underline; text-underline-offset: 3px; }
+
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s, transform .8s cubic-bezier(.2, .8, .2, 1); }
+    .reveal.in { opacity: 1; transform: none; }
+
+    @media (max-width: 980px) {
+      .nav-links { gap: 18px; flex-wrap: wrap; }
+      .nav-links .hide-sm { display: none; }
+      .nav-drop { flex-wrap: wrap; gap: 18px; }
+      .nav-drop-menu { position: static; flex-direction: row; gap: 18px; min-width: 0; margin: 0; padding: 0; background: none; border: 0; box-shadow: none; opacity: 1; transform: none; pointer-events: auto; visibility: visible; transition: none; }
+      .nav-drop-toggle { display: none; }  /* nothing to toggle: the items are already in the row */
+      .nav-drop-menu::before { display: none; }
+      .hud { display: none; }
+      .hint { display: none; }
+      .translate-grid, .drift-intro, .panels, .proof-grid, .tech-grid, .concept-grid, .people, .cta-grid { grid-template-columns: 1fr; }
+      .translate-grid { align-content: center; gap: 32px; }
+      .decode { min-height: 300px; }
+      .loop { grid-template-columns: 1fr; }
+      .loop > div { padding-right: 0; }
+      .proof-figs { grid-template-columns: 1fr 1fr; }
+      .prod-grid { grid-template-columns: 1fr; border-left: 0; }
+      .prod { border-right: 0; padding: 0 0 28px; }
+      .prod .mono.num { margin: 0 0 18px; padding-left: 0; }
+      .logo-dark { justify-self: start; max-width: 320px; }
+    }
+    @media (min-width: 981px) and (max-width: 1240px) {
+      .prod-grid { grid-template-columns: 1fr 1fr; }
+      .prod { padding-bottom: 36px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+
+  <nav class="nav scrolled" id="nav">
+    <a href="#top" class="brand" aria-label="Boulder Research home"></a>
+    <div class="nav-links mono">
+      <a href="#top" aria-current="page">Home</a>
+      <div class="nav-drop">
+        <a href="projects.html">Projects</a>
+        <button type="button" class="nav-drop-toggle" aria-expanded="false" aria-label="Show the Projects menu">▾</button>
+        <div class="nav-drop-menu">
+          <a href="project-warp-core.html">Warp Core</a>
+          <a href="project-miniloader.html">Miniloader</a>
+          <a href="project-astrolabe.html">Astrolabe</a>
+          <a href="research.html">Research</a>
+        </div>
+      </div>
+      <a href="investors.html" class="hide-sm">Investors</a>
+      <a href="about.html" class="hide-sm">About</a>
+      <a class="btn" href="mailto:chris@kellogg.io">Get in touch</a>
+    </div>
+  </nav>
+  <script>
+  // T-439: a touchscreen has no hover, so the caret is a real button that
+  // pins the dropdown open on tap (the CSS reads .is-open). Hover still
+  // opens it for a mouse pointer.
+  (function () {
+    const drop = document.querySelector(".nav-drop");
+    const caret = drop && drop.querySelector(".nav-drop-toggle");
+    if (!caret) return;
+    caret.addEventListener("click", () => {
+      const open = drop.classList.toggle("is-open");
+      caret.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  })();
+  </script>
+
+  <!-- 00 HERO -->
+  <header class="hero" id="top">
+    <canvas id="world" aria-label="Interactive topographic model: a boulder on a mountain with predicted futures drawn ahead of it" data-engine="three.js r165" width="1905" height="1074"></canvas>
+
+    <div class="hero-copy">
+      <div class="eyebrow mono">Boulder Research · Powerful AI Tools that drive buscess success</div>
+      <h1>Know what Will<br>happen<div>&nbsp;<span class="serif">next.</span></div></h1>
+      <p class="lede">We predict how your exact business operations and conditions respond to specific proposed actions, then <b>check every prediction against a real simulation engine</b>. Our highly efficient product can <span style="font-size: clamp(17px, 1.35vw, 20px);">run on a single GPU.</span></p>
+      <div class="hero-ctas">
+        <a href="#technology" class="btn">See the technology <span class="arrow">→</span></a>
+        <a href="#idea" class="btn ghost">How it works</a>
+      </div>
+    </div>
+
+    <div class="hud mono" aria-hidden="true">
+      <div class="hud-row"><span>Horizon</span><span id="hud-h">t+3.0s · 28 futures</span></div>
+      <div class="hud-row"><span>Model drift</span><span id="hud-d">0.22 m</span></div>
+      <div class="hud-bar"><i id="hud-db" style="width: 18.4505%;"></i></div>
+      <div class="hud-row"><span>Re-anchors</span><span id="hud-a">0211</span></div>
+      <div class="hud-row"><span>Runtime</span><span>Tier 0 · 16 GB</span></div>
+      <div class="legend">
+        <div><span class="sw"></span>What actually happens</div>
+        <div><span class="sw p"></span>What the model predicts</div>
+        <div><span class="sw a"></span>Snap back to ground truth</div>
+      </div>
+    </div>
+    <div class="hint mono"><i></i>Move your cursor to push the boulder</div>
+  </header>
+
+  <!-- 01 TRANSLATE -->
+  <section class="translate" id="idea">
+    <div class="translate-sticky wrap">
+      <div class="sec-head mono"><span>01 / The idea</span><span>Scroll to decode</span></div>
+      <div class="progress"><i id="tr-progress" style="transform: scaleX(0.852693);"></i></div>
+      <div class="translate-grid">
+        <div>
+          <div class="jargon-label mono"><span>How we describe it to engineers</span></div>
+          <p class="jargon">
+            We combine powerful&nbsp;<span class="ph seen" data-i="0">learned models<sup>1</sup></span>,
+            <span class="ph seen" data-i="1">simulation engines<sup>2</sup></span>, and
+<span class="ph seen" data-i="2">systems optimization<sup>3</sup></span>
+            to give you&nbsp;<span class="ph seen" data-i="3">interactive business modeling<sup>4</sup></span>&nbsp;on a computer you already own<span class="ph seen" data-i="4"><sup>5</sup></span>.
+          </p>
+        </div>
+        <div class="decode"><p style="margin:12px 0 0;font:16px/1.4 Georgia,serif;">Draft for Chris. Not the live site. The notes below are all visible here; on the editing page they appear one at a time.</p>
+          <div class="card" data-i="0">
+            <div class="mono">01 · <b>Learned models</b></div>
+            <div class="big">Intuition.</div>
+            <p>Our neural network learns your business operations and&nbsp; conditions to show you what's next. This early read allows you to prevent a problem and optimize for success.</p>
+          </div>
+          <div class="card" data-i="1">
+            <div class="mono">02 · <b>Simulation engines</b></div>
+            <div class="big">We check the record.</div>
+            <p>We keep a record of your operations and conditions built from the day-to-day facts of your business. Every prediction is checked against that record before you see it.</p>
+          </div>
+          <div class="card" data-i="2">
+            <div class="mono">03 · <b>Low-level systems optimization</b></div>
+            <div class="big">Making it fit.</div>
+            <p>A detailed prediction can fill a computer's memory in a minute. We shift that load across the machine, so it runs on a computer you already own.</p>
+          </div>
+          <div class="card" data-i="3">
+            <div class="mono">04 · <b>Interactive environment modeling</b></div>
+            <div class="big">“If I do this, what happens?”</div>
+            <p>We answer your questions: Given this operation, these conditions, and this action, what comes next, and what comes after that? Straight forward answers you can use to succeed.</p>
+          </div>
+          <div class="card" data-i="4">
+            <div class="mono">05 · <b>Constrained hardware</b></div>
+            <div class="big">A desk, not a datacenter.</div>
+            <p>Our first target for your business is to run your business outcome predictions on <b>one 16 GB GPU</b>. Our highly efficient models avoids spending thousands of GPUs training from scratch.</p>
+          </div>
+          <div class="card summary active" data-i="5">
+            <div class="mono">In one line</div>
+            <div class="big">predict what happens next, <em>checked against reality,&nbsp;</em>Afforable&nbsp; for you to use.</div>
+            <p>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 TECHNOLOGY -->
+  <section class="tech" id="technology">
+    <div class="wrap">
+      <div class="sec-head mono"><span>02 / Technology</span><span>Two technologies · one loop</span></div>
+      <div class="drift-intro reveal in" style="margin-bottom:0">
+        <h2>Simulate it.<br><span class="serif">Then watch it.</span></h2>
+        <p class="body">We work on two technologies that depend on each other. <b>Warp pipelines</b> run an operation and its conditions thousands of times at once on a GPU. <b>Anomaly detection models</b> learn what normal looks like in that operation and those conditions, and flag and explain anything that departs from it.</p>
+      </div>
+      <div class="tech-grid">
+        <div class="tech-card reveal in">
+          <canvas id="t-warp" width="640" height="220"></canvas>
+          <div class="inner">
+            <div class="mono">Technology 01 · Warp pipelines</div>
+            <h3>Thousands of operations and conditions at once</h3>
+            <div class="who">the simulator</div>
+            <p>We turn a simulation's rules and physics into GPU kernels. Each GPU lane holds one complete copy of the operation and its conditions, so one machine steps thousands of copies in parallel. The engine stops being the bottleneck and becomes a viewer for whichever copy you want to watch.</p>
+            <div class="stat mono"><span>Throughput</span><span>5.05M world-steps / sec</span></div>
+            <a class="proj-link mono" href="project-warp-core.html">See it live in Warp Core →</a>
+          </div>
+        </div>
+        <div class="tech-card reveal in">
+          <canvas id="t-anomaly" width="640" height="220"></canvas>
+          <div class="inner">
+            <div class="mono">Technology 02 · Anomaly detection</div>
+            <h3>Know when, and why</h3>
+            <div class="who">the watcher</div>
+            <p>Models that learn the normal behavior of a system, flag the moment it departs from normal, and follow a causal graph of the system's state back to the variable where the fault began.</p>
+            <div class="stat mono"><span>Fault tracing</span><span>10 / 10 bug classes located</span></div>
+            <a class="proj-link mono" href="project-warp-core.html#verify">How Warp Core traces faults →</a>
+          </div>
+        </div>
+      </div>
+      <div class="loop reveal in">
+        <div class="loop-title mono">How they<br>work together</div>
+        <div><div class="mono n">01</div><b>Simulate</b><p>A warp pipeline runs millions of scenarios: normal operation, plus faults we inject on purpose.</p></div>
+        <div><div class="mono n">02</div><b>Learn</b><p>Anomaly models train on that data. Every fault in it has a known cause, because we put it there.</p></div>
+        <div><div class="mono n">03</div><b>Detect &amp; explain</b><p>On a real system, the model flags what's abnormal and the causal graph points to where it started.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 CONCEPT -->
+  <section class="concept" id="concept">
+    <div class="wrap">
+      <div class="sec-head mono"><span>03 / The concept</span><span>A way to picture it</span></div>
+      <div class="concept-grid">
+        <div class="reveal in">
+          <h2>Lightning,<br><span class="serif">frozen in glass.</span></h2>
+          <p class="body">Picture a lightning bolt caught inside a block of glass. It happened in an instant, but now all of it is visible: where it struck, how it branched, and what it touched along the way.</p>
+          <p class="body">A fault in running software leaves the same kind of mark. When code executes in a way it shouldn't, the system's telemetry shifts. Because we extend the engine to produce that telemetry ourselves, we know where each signal comes from and what it measures, so the mark can be read backward from the symptom to the place it began.</p>
+          <div class="concept-key">
+            <div><div class="mono">The bolt</div><p>An execution fault: code doing something it shouldn't.</p></div>
+            <div><div class="mono">The glass</div><p>Telemetry from an engine we instrument, so every signal has a known origin and meaning.</p></div>
+            <div><div class="mono">The trace</div><p>Following the mark backward, from where it was noticed to where it began.</p></div>
+          </div>
+          <p class="concept-note mono">A concept, not a finished mechanism. We start with the simple version, test it hard, and get more precise as we scale.</p>
+        </div>
+        <div class="glass reveal in">
+          <canvas id="t-bolt" aria-label="A frozen lightning bolt inside a pane of glass, with a trace walking backward from the symptom to the point where it began" width="626" height="701"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 PRODUCTS -->
+  <section class="products" id="products">
+    <div class="wrap">
+      <div class="sec-head mono"><span>04 / Products</span><span>Four groups · one platform</span></div>
+      <div class="drift-intro reveal in" style="margin-bottom:0">
+        <h2>Four products.<br><span class="serif">Same two engines.</span></h2>
+        <p class="body">Each product group draws on warp pipelines, anomaly detection, or both. Wherever real failures are rare, expensive, or dangerous, we simulate them first.</p>
+      </div>
+      <div class="prod-grid">
+        <div class="prod reveal in">
+          <div class="mono num">01</div>
+          <h3>Robot manipulation</h3>
+          <div class="who">train in parallel</div>
+          <div class="uses mono"><span class="on">Warp pipeline</span><span class="on">Anomaly detection</span></div>
+          <p>Train grasping and manipulation policies across thousands of simulated robot cells at once, and catch the failures they hit in simulation before they reach hardware.</p>
+          <div class="today"><span class="mono">Foundation today</span>All 130 LIBERO manipulation tasks ported to MuJoCo Warp, with sim-to-real transfer to a physical arm.</div>
+        </div>
+        <div class="prod reveal in">
+          <div class="mono num">02</div>
+          <h3>AI that plays your game</h3>
+          <div class="who">find it, then fix it</div>
+          <div class="uses mono"><span class="on">Warp pipeline</span><span class="on">Anomaly detection</span></div>
+          <p>Agents play your game across thousands of parallel copies, hunt for bugs, and trace each one to the rule that caused it, with the action trace, state snapshot, and video to reproduce it.</p>
+          <div class="today"><span class="mono">Foundation today</span>The Super Mario World pilot and Warp Core on Godot.<br><a class="proj-link mono" href="project-warp-core.html">Warp Core project →</a></div>
+        </div>
+        <div class="prod reveal in">
+          <div class="mono num">03</div>
+          <h3>Industrial &amp; IoT</h3>
+          <div class="who">simulate the failure first</div>
+          <div class="uses mono"><span class="on">Warp pipeline</span><span class="on">Anomaly detection</span></div>
+          <p>Anomaly detection for infrastructure like hydroelectric dams. Real failures are rare, so we model the system in a game engine, run it thousands of times with faults injected, and train detectors before they ever watch a real sensor.</p>
+          <div class="today"><span class="mono">Foundation today</span>A fault-tracing method that applies to game engines and chemical plant simulators alike.</div>
+        </div>
+        <div class="prod reveal in">
+          <div class="mono num">04</div>
+          <h3>Cybersecurity</h3>
+          <div class="who">spot what doesn't belong</div>
+          <div class="uses mono"><span>Warp pipeline</span><span class="on">Anomaly detection</span></div>
+          <p>The same anomaly models applied to networks and systems: learn what normal traffic and behavior look like, flag what departs from it, and trace how it spread.</p>
+          <div class="today"><span class="mono">Foundation today</span>Early exploration.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 TEAM -->
+  <section class="team" id="team">
+    <div class="wrap">
+      <div class="sec-head mono"><span>05 / Team</span><span>Boulder, CO · Boston, MA</span></div>
+      <h2 class="reveal in">Built by people who make<br><span class="serif">models fit.</span></h2>
+      <div class="people">
+        <div class="person reveal in">
+          <h4>Adhitya Mohan</h4>
+          <div class="role">ML systems &amp; robotics</div>
+          <ul>
+            <li>MS CS, CU Boulder: ML systems (BASIL lab) and contact-aware robot control. Author of the Warp Core paper.</li>
+            <li>Reverse-engineered the Rockchip RK3588 NPU to deploy a vision-language model the vendor toolchain couldn't compile (SHARD, EuroMLSys '26).</li>
+            <li>Ported all 130 LIBERO manipulation tasks to MuJoCo Warp: thousands of parallel robot environments on one $700 GPU.</li>
+            <li>Interned at AMD Research &amp; Advanced Development (sim-to-real RL) and Seagate.</li>
+          </ul>
+          <div class="links">
+            <a class="site mono" href="https://amohan.dev/" target="_blank" rel="noopener">amohan.dev ↗</a>
+            <a class="site mono" href="https://www.linkedin.com/in/poad42" target="_blank" rel="noopener">LinkedIn ↗</a>
+          </div>
+        </div>
+        <div class="person reveal in">
+          <h4>Akhil Srinivas</h4>
+          <div class="role">Time series &amp; anomaly detection</div>
+          <ul>
+            <li>PhD in Computer Science.</li>
+            <li>Machine learning research assistant at UC Riverside (2022 to 2023): time series classification, clustering, and anomaly detection.</li>
+            <li>Worked on time series anomaly detection for an industrial research lab, and on improving the driving experience for Toyota.</li>
+            <li>MS in Computer Science, UC Riverside.</li>
+          </ul>
+          <div class="links">
+            <a class="site mono" href="https://vintrum.github.io/blog/2026/Muon_tail/" target="_blank" rel="noopener">Muon on long-tailed distributions ↗</a>
+            <a class="site mono" href="https://www.linkedin.com/in/tvas" target="_blank" rel="noopener">LinkedIn ↗</a>
+          </div>
+        </div>
+        <div class="person reveal in">
+          <h4>Chris Kellogg</h4>
+          <div class="role">AI product &amp; infrastructure</div>
+          <ul>
+            <li>AI-native full-stack architect who takes concepts to running, cloud-hosted systems without handoffs.</li>
+            <li>Built and runs <a href="project-miniloader.html">Miniloader</a>, a local-AI platform for running agents and models on your own hardware.</li>
+            <li>Works on the Mario World and Godot agent demonstrations and the path from prototype to product.</li>
+          </ul>
+          <div class="links">
+            <a class="site mono" href="https://kellogg.io/" target="_blank" rel="noopener">kellogg.io ↗</a>
+            <a class="site mono" href="https://www.linkedin.com/in/chris-kellogg-91202425/" target="_blank" rel="noopener">LinkedIn ↗</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 PORTFOLIO -->
+  <section class="portfolio" id="portfolio">
+    <div class="wrap">
+      <div class="sec-head mono"><span>06 / Portfolio</span><span>Person · company · product</span></div>
+      <h2 class="reveal in">One portfolio,<br><span class="serif">three sites.</span></h2>
+      <p class="body reveal in">Chris Kellogg builds and runs a small portfolio of connected work. Boulder Research, founded with Adhitya Mohan and Akhil S, is the company: it researches how an operation and its conditions respond, on a single GPU, starting with Warp Core, which runs thousands of copies of a Godot game in parallel, checks them against the engine and traces faults to their cause. Miniloader is the product: a local-AI platform for running agents and models on your own hardware. Chris is the person behind both, covering product, rapid prototyping and AI infrastructure, and turning research into shipped software.</p>
+      <div class="sites mono reveal in">
+        <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person ↗</a>
+        <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 CTA -->
+  <section class="cta" id="contact">
+    <div class="wrap">
+      <div class="cta-grid">
+        <div class="reveal in">
+          <h2>Help us find out<br><span class="serif">what happens next.</span></h2>
+          <p class="body">We're looking for design partners in games, robotics, industrial systems, and security, and for investors who want the briefs and the Warp Core paper.</p>
+          <div class="hero-ctas">
+            <a class="btn" href="mailto:chris@kellogg.io?subject=Design%20partner">Become a design partner <span class="arrow">→</span></a>
+            <a class="btn ghost" href="projects.html">See what ships</a>
+            <a class="btn ghost" href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+          </div>
+        </div>
+        <img class="logo-dark reveal in" src="logo-paper.png" alt="Boulder Research">
+      </div>
+      <footer class="mono">
+        <span>© 2026 Boulder Research</span>
+        <a href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+        <span class="portfolio-links">Portfolio: <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person</a> · <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware</a></span>
+        <span>Intelligence for operations and conditions</span>
+      </footer>
+    </div>
+  </section>
+
+  <!-- ================= 2D CANVAS + PAGE BEHAVIOUR ================= -->
+  <script>
+  (() => {
+    const INK = '#0b0b0c', PAPER = '#efede7', BLUE = '#2b4bff', FAULT = '#ff3d2e';
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // nav + reveal
+    const nav = document.getElementById('nav');
+    addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 40), { passive: true });
+    const rio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); rio.unobserve(e.target); } }), { threshold: .12 });
+    document.querySelectorAll('.reveal').forEach(el => rio.observe(el));
+
+    // translate section
+    const tr = document.querySelector('.translate');
+    const phrases = [...document.querySelectorAll('.jargon .ph')];
+    const cards = [...document.querySelectorAll('.decode .card')];
+    const trBar = document.getElementById('tr-progress');
+    let curStep = -1;
+    function onTranslateScroll() {
+      const r = tr.getBoundingClientRect();
+      const total = tr.offsetHeight - innerHeight;
+      const p = Math.min(.9999, Math.max(0, -r.top / total));
+      trBar.style.transform = `scaleX(${p})`;
+      const step = Math.floor(p * cards.length);
+      if (step === curStep) return;
+      curStep = step;
+      phrases.forEach((ph, i) => {
+        ph.classList.toggle('on', i === step);
+        ph.classList.toggle('seen', i < step);
+      });
+      cards.forEach((c, i) => c.classList.toggle('active', i === step));
+    }
+    addEventListener('scroll', onTranslateScroll, { passive: true });
+    onTranslateScroll();
+
+    // shared canvas loop
+    function fit(c) {
+      const r = c.getBoundingClientRect();
+      const d = Math.min(devicePixelRatio || 1, 2);
+      const w = Math.max(1, Math.round(r.width * d)), h = Math.max(1, Math.round(r.height * d));
+      if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+      const ctx = c.getContext('2d');
+      ctx.setTransform(d, 0, 0, d, 0, 0);
+      return { ctx, w: r.width, h: r.height, d };
+    }
+    const anims = [];
+    const vio = new IntersectionObserver(es => es.forEach(e => {
+      const a = anims.find(a => a.el === e.target); if (a) a.vis = e.isIntersecting;
+    }), { rootMargin: '120px' });
+    function register(el, fn) { anims.push({ el, fn, vis: false }); vio.observe(el); }
+    let frame = 0;
+    function loop(t) {
+      frame++;
+      for (const a of anims) if (a.vis && (!reduce || frame % 4 === 0)) a.fn(t / 1000, frame);
+      requestAnimationFrame(loop);
+    }
+
+    // seeded rng
+    function rng(seed) { return () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }; }
+
+    /* ---------- TECH: WARP LANES ---------- */
+    (() => {
+      const c = document.getElementById('t-warp');
+      const R = rng(41), lanes = Array.from({ length: 512 }, () => ({ f: 1.6 + R() * 1.4, p: R() * 6.28, a: .45 + R() * .5 }));
+      register(c, (t) => {
+        const { ctx, w, h } = fit(c);
+        ctx.clearRect(0, 0, w, h);
+        const top = 30, cell = 22, cols = Math.max(1, Math.floor((w - 20) / cell)), rows = Math.max(1, Math.floor((h - top - 10) / cell));
+        const x0 = (w - cols * cell) / 2;
+        for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+          const k = (j * cols + i) % lanes.length, L = lanes[k];
+          const cx = x0 + i * cell, cy = top + j * cell, lane0 = i === 0 && j === 0;
+          ctx.strokeStyle = lane0 ? BLUE : 'rgba(11,11,12,.14)'; ctx.lineWidth = lane0 ? 1.5 : 1;
+          ctx.strokeRect(cx + 1.5, cy + 1.5, cell - 3, cell - 3);
+          ctx.fillStyle = 'rgba(11,11,12,.35)'; ctx.fillRect(cx + 3, cy + cell - 5, cell - 6, 1);
+          const bounce = Math.abs(Math.sin(t * L.f + L.p)) * L.a;
+          ctx.fillStyle = lane0 ? BLUE : INK;
+          ctx.fillRect(cx + cell / 2 - 2.5, cy + cell - 10 - bounce * (cell - 13), 5, 5);
+        }
+        ctx.fillStyle = '#75736d'; ctx.font = '10px JetBrains Mono, monospace'; ctx.textBaseline = 'top'; ctx.textAlign = 'left';
+        ctx.fillText('EACH CELL = ONE WORLD · ' + (rows * cols) + ' SHOWN', 10, 10);
+        ctx.textAlign = 'right'; ctx.fillStyle = BLUE; ctx.fillText('■ LANE 0 · RENDERED BY THE ENGINE', w - 10, 10); ctx.textAlign = 'left';
+      });
+    })();
+
+    /* ---------- TECH: ANOMALY TRACE ---------- */
+    (() => {
+      const c = document.getElementById('t-anomaly');
+      const noise = (s) => { const x = Math.sin(s * 12.9898) * 43758.5453; return x - Math.floor(x) - .5; };
+      const PERIOD = 520, FS = 400, FE = 470;
+      const fault = (s) => { const m = ((s % PERIOD) + PERIOD) % PERIOD; return m < FS || m > FE ? 0 : Math.sin(((m - FS) / (FE - FS)) * Math.PI) * 1.25; };
+      const val = (s) => Math.sin(s * .045) * .32 + Math.sin(s * .11 + 1) * .12 + noise(s) * .14 + fault(s);
+      register(c, (t) => {
+        const { ctx, w, h } = fit(c);
+        ctx.clearRect(0, 0, w, h);
+        const top = 34, mid = top + (h - top) * .55, amp = (h - top) * .28, step = 2;
+        const n = Math.ceil(w / step), s0 = Math.floor(t * 60);
+        ctx.fillStyle = 'rgba(43,75,255,.07)'; ctx.fillRect(0, mid - amp * .62, w, amp * 1.24);
+        ctx.strokeStyle = 'rgba(43,75,255,.35)'; ctx.setLineDash([3, 4]); ctx.lineWidth = 1;
+        [mid - amp * .62, mid + amp * .62].forEach(y => { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); });
+        ctx.setLineDash([]);
+        let flagged = null;
+        for (let i = 1; i < n; i++) {
+          const sa = s0 - n + i, sb = sa + 1;
+          const out = fault(sb) > .25;
+          ctx.strokeStyle = out ? FAULT : INK; ctx.lineWidth = out ? 2.2 : 1.6;
+          ctx.beginPath(); ctx.moveTo((i - 1) * step, mid - val(sa) * amp); ctx.lineTo(i * step, mid - val(sb) * amp); ctx.stroke();
+          if (out && fault(sb) > (flagged ? fault(flagged.s) : 0)) flagged = { s: sb, x: i * step, y: mid - val(sb) * amp };
+        }
+        if (flagged) {
+          ctx.strokeStyle = FAULT; ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.arc(flagged.x, flagged.y, 9, 0, 7); ctx.stroke();
+          ctx.fillStyle = FAULT; ctx.font = '600 10px JetBrains Mono, monospace'; ctx.textBaseline = 'bottom';
+          ctx.textAlign = flagged.x > w - 150 ? 'right' : 'left';
+          ctx.fillText('FLAGGED · TRACED TO SOURCE', flagged.x + (ctx.textAlign === 'right' ? -14 : 14), flagged.y - 8);
+        }
+        ctx.fillStyle = '#75736d'; ctx.font = '10px JetBrains Mono, monospace'; ctx.textBaseline = 'top'; ctx.textAlign = 'left';
+        ctx.fillText('SENSOR · LIVE', 10, 10);
+        ctx.textAlign = 'right'; ctx.fillStyle = BLUE; ctx.fillText('▭ LEARNED NORMAL', w - 10, 10); ctx.textAlign = 'left';
+      });
+    })();
+
+    /* ---------- CONCEPT: LIGHTNING IN GLASS ---------- */
+    (() => {
+      const c = document.getElementById('t-bolt');
+      const R = rng(1187);
+      // The frozen bolt, in unit coordinates. The trunk runs from the origin (top) down to the symptom (bottom).
+      const N = 46, trunk = [];
+      let bx = 0.46;
+      for (let i = 0; i <= N; i++) {
+        bx += (R() - .5) * .075 + (.5 - bx) * .03;
+        trunk.push({ x: bx, y: .1 + (i / N) * .8 });
+      }
+      const paths = [{ pts: trunk, w: 3 }];
+      function branch(from, depth, dir) {
+        const pts = [from], len = depth ? 4 + Math.floor(R() * 4) : 6 + Math.floor(R() * 7);
+        let x = from.x, y = from.y;
+        for (let i = 0; i < len; i++) {
+          x += dir * .028 + (R() - .5) * .04;
+          y += .026 + (R() - .5) * .012;
+          if (x < .05 || x > .95 || y > .93) break;
+          pts.push({ x, y });
+          if (!depth && i > 1 && R() < .2) branch(pts[pts.length - 1], 1, -dir);
+        }
+        if (pts.length > 2) paths.push({ pts, w: depth ? .9 : 1.3 });
+      }
+      for (let i = 5; i < N - 4; i += 4 + Math.floor(R() * 4)) if (R() < .75) branch(trunk[i], 0, R() < .5 ? -1 : 1);
+
+      const ease = (u) => u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+      register(c, (t) => {
+        const { ctx, w, h } = fit(c);
+        ctx.clearRect(0, 0, w, h);
+        const gx = 14, gy = 34, gw = w - 28, gh = h - gy - 14;
+        const P = (p) => ({ x: gx + p.x * gw, y: gy + p.y * gh });
+
+        // the pane of glass
+        const g = ctx.createLinearGradient(gx, gy, gx + gw, gy + gh);
+        g.addColorStop(0, 'rgba(255,255,255,.7)'); g.addColorStop(.55, 'rgba(255,255,255,.12)'); g.addColorStop(1, 'rgba(43,75,255,.09)');
+        ctx.fillStyle = g; ctx.fillRect(gx, gy, gw, gh);
+        ctx.strokeStyle = 'rgba(11,11,12,.32)'; ctx.lineWidth = 1; ctx.strokeRect(gx + .5, gy + .5, gw - 1, gh - 1);
+        ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.strokeRect(gx + 3.5, gy + 3.5, gw - 7, gh - 7);
+        ctx.fillStyle = 'rgba(255,255,255,.32)';
+        ctx.beginPath(); ctx.moveTo(gx + 4, gy + 4); ctx.lineTo(gx + gw * .42, gy + 4); ctx.lineTo(gx + 4, gy + gh * .34); ctx.closePath(); ctx.fill();
+
+        // telemetry probes, lit where the bolt passes
+        const segs = [];
+        paths.forEach(p => { for (let i = 1; i < p.pts.length; i++) segs.push([P(p.pts[i - 1]), P(p.pts[i])]); });
+        const step = 24;
+        for (let y = gy + 14; y < gy + gh - 8; y += step) for (let x = gx + 14; x < gx + gw - 8; x += step) {
+          let near = 1e9;
+          for (const s of segs) {
+            const dx = s[1].x - s[0].x, dy = s[1].y - s[0].y, l2 = dx * dx + dy * dy || 1;
+            const u = Math.max(0, Math.min(1, ((x - s[0].x) * dx + (y - s[0].y) * dy) / l2));
+            const d = Math.hypot(x - (s[0].x + u * dx), y - (s[0].y + u * dy));
+            if (d < near) near = d;
+          }
+          if (near < 9) { ctx.fillStyle = FAULT; ctx.fillRect(x - 2.5, y - 2.5, 5, 5); }
+          else { ctx.fillStyle = 'rgba(11,11,12,.2)'; ctx.fillRect(x - 1.25, y - 1.25, 2.5, 2.5); }
+        }
+
+        // the frozen bolt
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        for (const pass of [0, 1]) for (const p of paths) {
+          ctx.strokeStyle = pass ? 'rgba(255,61,46,.9)' : 'rgba(255,61,46,.14)';
+          ctx.lineWidth = pass ? p.w : p.w + 6;
+          ctx.beginPath();
+          p.pts.forEach((q, i) => { const a = P(q); i ? ctx.lineTo(a.x, a.y) : ctx.moveTo(a.x, a.y); });
+          ctx.stroke();
+        }
+
+        // the backward trace: symptom -> origin
+        const o = P(trunk[0]), tip = P(trunk[N]);
+        const ph = (t % 7) / 7, s = ease(Math.max(0, Math.min(1, (ph - .12) / .66)));
+        const f = (1 - s) * N, i0 = Math.ceil(f);
+        const lo = trunk[Math.max(0, i0 - 1)], hi = trunk[i0], u = i0 - f;
+        const head = P({ x: hi.x + (lo.x - hi.x) * u, y: hi.y + (lo.y - hi.y) * u });
+        if (s > 0) {
+          ctx.strokeStyle = BLUE; ctx.lineWidth = 3.5;
+          ctx.beginPath(); ctx.moveTo(tip.x, tip.y);
+          for (let i = N - 1; i >= i0; i--) { const a = P(trunk[i]); ctx.lineTo(a.x, a.y); }
+          ctx.lineTo(head.x, head.y); ctx.stroke();
+          ctx.fillStyle = BLUE; ctx.beginPath(); ctx.arc(head.x, head.y, 5, 0, 7); ctx.fill();
+        }
+        const arrived = ph > .78;
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = arrived ? FAULT : 'rgba(255,61,46,.45)';
+        if (!arrived) ctx.setLineDash([3, 3]);
+        ctx.beginPath(); ctx.arc(o.x, o.y, arrived ? 11 + Math.sin(t * 5) * 2 : 11, 0, 7); ctx.stroke(); ctx.setLineDash([]);
+        ctx.strokeStyle = FAULT; ctx.beginPath(); ctx.arc(tip.x, tip.y, 8, 0, 7); ctx.stroke();
+
+        // labels
+        ctx.font = '600 10px JetBrains Mono, monospace'; ctx.textBaseline = 'middle';
+        const tag = (txt, p, color, dy) => {
+          const right = p.x > w - 170;
+          ctx.fillStyle = color; ctx.textAlign = right ? 'right' : 'left';
+          ctx.fillText(txt, p.x + (right ? -18 : 18), p.y + dy);
+        };
+        tag(arrived ? 'ORIGIN · FOUND' : 'ORIGIN', o, FAULT, 0);
+        tag('SYMPTOM · NOTICED HERE', tip, FAULT, 0);
+        ctx.textBaseline = 'top'; ctx.font = '10px JetBrains Mono, monospace';
+        ctx.fillStyle = '#75736d'; ctx.textAlign = 'left'; ctx.fillText('FAULT · FROZEN IN TELEMETRY', 14, 12);
+        ctx.fillStyle = BLUE; ctx.textAlign = 'right'; ctx.fillText('■ BACKWARD TRACE', w - 14, 12); ctx.textAlign = 'left';
+      });
+    })();
+
+    requestAnimationFrame(loop);
+  })();
+  </script>
+
+  <!-- ================= THREE.JS HERO ================= -->
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+    } }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { Line2 } from 'three/addons/lines/Line2.js';
+    import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+    import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+
+    const hero = document.querySelector('.hero');
+    const canvas = document.getElementById('world');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    } catch (e) {
+      hero.classList.add('webgl-fallback');
+      throw e;
+    }
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    const PAPER = new THREE.Color('#efede7'), INK = new THREE.Color('#0b0b0c'), BLUE = new THREE.Color('#2b4bff');
+    renderer.setClearColor(PAPER);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(34, 1, .1, 200);
+
+    // ---------- terrain field ----------
+    function hash(i, j) { const s = Math.sin(i * 127.1 + j * 311.7) * 43758.5453; return s - Math.floor(s); }
+    function vnoise(x, z) {
+      const i = Math.floor(x), j = Math.floor(z), fx = x - i, fz = z - j;
+      const u = fx * fx * (3 - 2 * fx), v = fz * fz * (3 - 2 * fz);
+      const a = hash(i, j), b = hash(i + 1, j), c = hash(i, j + 1), d = hash(i + 1, j + 1);
+      return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+    }
+    function fbm(x, z) { let s = 0, a = .5, f = 1; for (let k = 0; k < 4; k++) { s += a * vnoise(x * f, z * f); f *= 2.03; a *= .5; } return s; }
+    function heightAt(x, z) {
+      const peak = (x0, z0, sx, sz, a, p) => a * Math.exp(-Math.pow(Math.hypot((x - x0) / sx, (z - z0) / sz), p));
+      const m = peak(.8, -1.4, 2.2, 2.6, 5.6, 1.25) + peak(-3.4, -.6, 2.0, 2.2, 3.0, 1.3) + peak(4.3, 0, 2.1, 2.0, 2.6, 1.3)
+              + peak(-6.6, .9, 2.2, 2.0, 1.3, 1.6) + peak(7.2, 1.2, 1.8, 1.9, 1.1, 1.6) + peak(0, 4, 6, 2.5, .45, 2);
+      const r = 1 - Math.abs(2 * fbm(x * .55 + 3.1, z * .55 - 1.7) - 1);
+      return m * (.78 + .38 * r) + .12 * fbm(x * 1.4, z * 1.4);
+    }
+
+    const EXT = 12, N = 257, STEP = (2 * EXT) / (N - 1);
+    const HF = new Float32Array(N * N), GX = new Float32Array(N * N), GZ = new Float32Array(N * N), BX = new Float32Array(N * N), BZ = new Float32Array(N * N);
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) HF[j * N + i] = heightAt(-EXT + i * STEP, -EXT + j * STEP);
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+      const i0 = Math.max(0, i - 1), i1 = Math.min(N - 1, i + 1), j0 = Math.max(0, j - 1), j1 = Math.min(N - 1, j + 1);
+      GX[j * N + i] = (HF[j * N + i1] - HF[j * N + i0]) / ((i1 - i0) * STEP);
+      GZ[j * N + i] = (HF[j1 * N + i] - HF[j0 * N + i]) / ((j1 - j0) * STEP);
+      const x = -EXT + i * STEP, z = -EXT + j * STEP;
+      BX[j * N + i] = (fbm(x * .35 + 10, z * .35) - .5) * 2.6;
+      BZ[j * N + i] = (fbm(x * .35, z * .35 + 20) - .5) * 2.6;
+    }
+    function sample(F, x, z) {
+      const fx = Math.min(N - 1.001, Math.max(0, (x + EXT) / STEP)), fz = Math.min(N - 1.001, Math.max(0, (z + EXT) / STEP));
+      const i = Math.floor(fx), j = Math.floor(fz), u = fx - i, v = fz - j, k = j * N + i;
+      return (F[k] * (1 - u) + F[k + 1] * u) * (1 - v) + (F[k + N] * (1 - u) + F[k + N + 1] * u) * v;
+    }
+    const H = (x, z) => sample(HF, x, z);
+
+    // ---------- terrain mesh ----------
+    const SEG = 220;
+    const geo = new THREE.PlaneGeometry(2 * EXT, 2 * EXT, SEG, SEG);
+    geo.rotateX(-Math.PI / 2);
+    const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) pos.setY(i, heightAt(pos.getX(i), pos.getZ(i)));
+    geo.computeVertexNormals();
+
+    const terrainMat = new THREE.ShaderMaterial({
+      uniforms: { uPaper: { value: PAPER }, uInk: { value: INK }, uTime: { value: 0 } },
+      vertexShader: `
+        varying float vH; varying vec3 vN; varying vec3 vW; varying float vD;
+        void main() {
+          vH = position.y;
+          vN = normalize(mat3(modelMatrix) * normal);
+          vec4 w = modelMatrix * vec4(position, 1.0);
+          vW = w.xyz;
+          vec4 mv = viewMatrix * w;
+          vD = -mv.z;
+          gl_Position = projectionMatrix * mv;
+        }`,
+      fragmentShader: `
+        uniform vec3 uPaper; uniform vec3 uInk;
+        varying float vH; varying vec3 vN; varying vec3 vW; varying float vD;
+        float iso(float v, float px) {
+          float d = abs(fract(v + 0.5) - 0.5);
+          float fw = max(fwidth(v), 1e-4);
+          return 1.0 - smoothstep(0.0, fw * px, d);
+        }
+        void main() {
+          float hh = vH + 0.13;
+          float minor = iso(hh * 5.0, 1.0);
+          float major = iso(hh * 1.0, 1.7);
+          vec3 L = normalize(vec3(-0.55, 0.75, 0.35));
+          float lit = clamp(dot(normalize(vN), L), 0.0, 1.0);
+          vec3 base = mix(uPaper, uPaper * 0.84, clamp(0.78 - lit, 0.0, 1.0) * 0.9);
+          float r = length(vW.xz);
+          float edge = smoothstep(11.5, 6.0, r);
+          float far = smoothstep(46.0, 20.0, vD);
+          float a = (minor * 0.32 + major * 0.78) * far;
+          vec3 col = mix(base, uInk, a);
+          gl_FragColor = vec4(mix(uPaper, col, edge), 1.0);
+          #include <colorspace_fragment>
+        }`,
+      polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1,
+    });
+    const terrain = new THREE.Mesh(geo, terrainMat);
+    scene.add(terrain);
+
+    // ---------- boulder ----------
+    const R_B = .3;
+    const boulder = new THREE.Mesh(new THREE.IcosahedronGeometry(R_B, 0), new THREE.MeshBasicMaterial({ color: INK }));
+    scene.add(boulder);
+
+    // ---------- trail (ground truth) ----------
+    const TRAIL = 200;
+    const trailPts = new Float32Array(TRAIL * 3);
+    const trailGeo = new LineGeometry();
+    trailGeo.setPositions(new Float32Array(TRAIL * 3));
+    const trailMat = new LineMaterial({ color: INK, linewidth: 3.2, worldUnits: false });
+    const trail = new Line2(trailGeo, trailMat);
+    trail.frustumCulled = false;
+    scene.add(trail);
+    function writeTrail() {
+      const buf = trailGeo.attributes.instanceStart.data, a = buf.array;
+      for (let i = 0; i < TRAIL - 1; i++) {
+        a[i * 6] = trailPts[i * 3]; a[i * 6 + 1] = trailPts[i * 3 + 1]; a[i * 6 + 2] = trailPts[i * 3 + 2];
+        a[i * 6 + 3] = trailPts[i * 3 + 3]; a[i * 6 + 4] = trailPts[i * 3 + 4]; a[i * 6 + 5] = trailPts[i * 3 + 5];
+      }
+      buf.needsUpdate = true;
+    }
+
+    // ---------- predicted futures ----------
+    const K = 28, HZ = 90, RDT = 1 / 30;
+    const futPos = new Float32Array(K * (HZ - 1) * 2 * 3), futCol = new Float32Array(K * (HZ - 1) * 2 * 3);
+    const futGeo = new THREE.BufferGeometry();
+    futGeo.setAttribute('position', new THREE.BufferAttribute(futPos, 3));
+    futGeo.setAttribute('color', new THREE.BufferAttribute(futCol, 3));
+    const futures = new THREE.LineSegments(futGeo, new THREE.LineBasicMaterial({ vertexColors: true }));
+    futures.frustumCulled = false;
+    scene.add(futures);
+    const tmpC = new THREE.Color();
+    for (let k = 0; k < K; k++) for (let i = 0; i < HZ - 1; i++) for (let e = 0; e < 2; e++) {
+      const u = (i + e) / (HZ - 1);
+      tmpC.copy(BLUE).lerp(PAPER, Math.min(.92, u * 1.05));
+      const o = ((k * (HZ - 1) + i) * 2 + e) * 3;
+      futCol[o] = tmpC.r; futCol[o + 1] = tmpC.g; futCol[o + 2] = tmpC.b;
+    }
+
+    // model ghost (where the model thinks the boulder is)
+    const ghost = new THREE.Mesh(new THREE.RingGeometry(.2, .26, 32), new THREE.MeshBasicMaterial({ color: BLUE, depthTest: false, transparent: true }));
+    ghost.rotation.x = -Math.PI / 2; ghost.renderOrder = 5;
+    scene.add(ghost);
+    const tether = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]), new THREE.LineDashedMaterial({ color: BLUE, dashSize: .08, gapSize: .06, depthTest: false }));
+    tether.renderOrder = 5; tether.frustumCulled = false;
+    scene.add(tether);
+
+    // anchor pulses
+    const rings = Array.from({ length: 5 }, () => {
+      const m = new THREE.Mesh(new THREE.RingGeometry(.96, 1, 64), new THREE.MeshBasicMaterial({ color: BLUE, transparent: true, opacity: 0, depthTest: false }));
+      m.rotation.x = -Math.PI / 2; m.renderOrder = 6; scene.add(m); m.userData.t = 1; return m;
+    });
+    let ringIdx = 0;
+
+    // target marker
+    const target = new THREE.Group();
+    const tRing = new THREE.Mesh(new THREE.RingGeometry(.22, .25, 40), new THREE.MeshBasicMaterial({ color: INK, depthTest: false }));
+    tRing.rotation.x = -Math.PI / 2;
+    const tCross = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(-.4, 0, 0), new THREE.Vector3(-.12, 0, 0), new THREE.Vector3(.12, 0, 0), new THREE.Vector3(.4, 0, 0),
+      new THREE.Vector3(0, 0, -.4), new THREE.Vector3(0, 0, -.12), new THREE.Vector3(0, 0, .12), new THREE.Vector3(0, 0, .4),
+      new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 1.2, 0)]), new THREE.LineBasicMaterial({ color: INK, depthTest: false }));
+    target.add(tRing, tCross);
+    target.renderOrder = 7; tRing.renderOrder = 7; tCross.renderOrder = 7;
+    scene.add(target);
+
+    // ---------- simulation ----------
+    const G = 3.2, FR = 1.1, PUSH = 4.6;
+    const truth = { x: 3, z: 2, vx: 0, vz: 0 };
+    const model = { ...truth };
+    let anchors = 0, epochSeeds = [], restT = 0;
+    function reseed() {
+      epochSeeds = Array.from({ length: K }, () => ({ phi: (Math.random() - .5) * 1.6, gain: .55 + Math.random() * .9, g: .8 + Math.random() * .4, ph: Math.random() * 6.28, w: .04 + Math.random() * .08 }));
+    }
+    function anchorNow() {
+      Object.assign(model, truth);
+      anchors++; reseed();
+      const r = rings[ringIdx++ % rings.length];
+      r.userData.t = 0; r.position.set(truth.x, H(truth.x, truth.z) + .05, truth.z);
+    }
+    function step(s, ax, az, dt, gMul, bias) {
+      let gx = sample(GX, s.x, s.z), gz = sample(GZ, s.x, s.z);
+      let fx = -G * gMul * gx + ax, fz = -G * gMul * gz + az;
+      if (bias) { fx += sample(BX, s.x, s.z); fz += sample(BZ, s.x, s.z); }
+      s.vx += fx * dt; s.vz += fz * dt;
+      const f = Math.exp(-FR * dt); s.vx *= f; s.vz *= f;
+      const sp = Math.hypot(s.vx, s.vz); if (sp > 6) { s.vx *= 6 / sp; s.vz *= 6 / sp; }
+      s.x += s.vx * dt; s.z += s.vz * dt;
+    }
+    function respawn() {
+      const a = Math.random() * Math.PI * 2, r = 2.6 + Math.random() * 1.6;
+      truth.x = .8 + Math.cos(a) * r; truth.z = -1.4 + Math.sin(a) * r; truth.vx = truth.vz = 0;
+      for (let i = 0; i < TRAIL; i++) { trailPts[i * 3] = truth.x; trailPts[i * 3 + 1] = H(truth.x, truth.z) + .05; trailPts[i * 3 + 2] = truth.z; }
+      anchorNow();
+    }
+    respawn();
+
+    // ---------- input ----------
+    const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+    const tgt = new THREE.Vector3(0, 0, 0);
+    let lastPointer = -1e9, pointerDirty = false, mouse = { x: 0, y: 0 };
+    hero.addEventListener('pointermove', e => {
+      const r = canvas.getBoundingClientRect();
+      ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+      mouse.x = ndc.x; mouse.y = ndc.y;
+      pointerDirty = true;
+    });
+
+    // ---------- layout ----------
+    const lookAt = new THREE.Vector3();
+    function resize() {
+      const w = hero.clientWidth, h = hero.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.fov = w / h < .9 ? 48 : 34;
+      camera.updateProjectionMatrix();
+      trailMat.resolution.set(w, h);
+      lookAt.set(w / h > 1.2 ? -4 : .4, w / h > 1.2 ? 2.6 : -.6, -1);
+    }
+    addEventListener('resize', resize);
+    resize();
+
+    let visible = true;
+    new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(hero);
+
+    // ---------- HUD ----------
+    const hudD = document.getElementById('hud-d'), hudDB = document.getElementById('hud-db'), hudA = document.getElementById('hud-a');
+
+    // ---------- loop ----------
+    const clock = new THREE.Clock();
+    let tAcc = 0, anchorT = 0, frameN = 0, time = 0;
+    const ANCHOR_EVERY = 2.2;
+    const up = new THREE.Vector3(0, 1, 0), axis = new THREE.Vector3(), q = new THREE.Quaternion();
+
+    function tick() {
+      requestAnimationFrame(tick);
+      if (!visible) { clock.getDelta(); return; }
+      const dt = Math.min(clock.getDelta(), 1 / 20) * (reduce ? .35 : 1);
+      time += dt; frameN++;
+
+      // camera
+      const orbit = Math.sin(time * .06) * .28 + mouse.x * .06;
+      const camR = camera.aspect < 1.2 ? 27 : 23;
+      camera.position.set(lookAt.x + Math.sin(orbit) * camR * .55 + 3, camR * .46 + mouse.y * .6, lookAt.z + Math.cos(orbit) * camR);
+      camera.lookAt(lookAt);
+      camera.updateMatrixWorld();
+
+      // target
+      if (pointerDirty) {
+        pointerDirty = false;
+        ray.setFromCamera(ndc, camera);
+        const hit = ray.intersectObject(terrain, false)[0];
+        if (hit && Math.hypot(hit.point.x, hit.point.z) < 10.5) { tgt.copy(hit.point); lastPointer = time; }
+      }
+      if (time - lastPointer > 2.5) {
+        const a = time * .32;
+        tgt.set(.8 + Math.cos(a) * 4.4, 0, -1.4 + Math.sin(a) * 3.6);
+        tgt.y = H(tgt.x, tgt.z);
+      }
+      target.position.set(tgt.x, H(tgt.x, tgt.z) + .04, tgt.z);
+      tRing.rotation.z = time;
+
+      // action toward target
+      const dx = tgt.x - truth.x, dz = tgt.z - truth.z, dist = Math.hypot(dx, dz) || 1;
+      const mag = PUSH * Math.min(1, dist / 1.5);
+      const ax = dx / dist * mag, az = dz / dist * mag;
+
+      // integrate truth (engine) and model (learned, biased)
+      const sub = 3, sdt = dt / sub;
+      for (let s = 0; s < sub; s++) { step(truth, ax, az, sdt, 1, false); step(model, ax, az, sdt, .9, true); }
+
+      anchorT += dt;
+      if (anchorT > ANCHOR_EVERY) { anchorT = 0; anchorNow(); }
+
+      const sp = Math.hypot(truth.vx, truth.vz);
+      restT = sp < .08 ? restT + dt : 0;
+      if (Math.hypot(truth.x, truth.z) > 10.4 || restT > 3) respawn();
+
+      // boulder
+      const by = H(truth.x, truth.z) + R_B * .8;
+      boulder.position.set(truth.x, by, truth.z);
+      if (sp > 1e-3) {
+        axis.set(truth.vz, 0, -truth.vx).normalize();
+        q.setFromAxisAngle(axis, sp * dt / R_B);
+        boulder.quaternion.premultiply(q);
+      }
+
+      // trail
+      if (frameN % 2 === 0) {
+        trailPts.copyWithin(3, 0, (TRAIL - 1) * 3);
+        trailPts[0] = truth.x; trailPts[1] = H(truth.x, truth.z) + .06; trailPts[2] = truth.z;
+        writeTrail();
+      }
+
+      // ghost + tether
+      const gy = H(model.x, model.z) + .05;
+      ghost.position.set(model.x, gy, model.z);
+      const tp = tether.geometry.attributes.position;
+      tp.setXYZ(0, truth.x, by - R_B * .6, truth.z); tp.setXYZ(1, model.x, gy, model.z); tp.needsUpdate = true;
+      tether.computeLineDistances();
+
+      // futures from the model's belief
+      const baseAng = Math.atan2(az, ax);
+      let o = 0;
+      for (let k = 0; k < K; k++) {
+        const S = epochSeeds[k];
+        const f = { x: model.x, z: model.z, vx: model.vx, vz: model.vz };
+        let px = f.x, pz = f.z, py = H(px, pz) + .07;
+        for (let i = 1; i < HZ; i++) {
+          const u = i / HZ;
+          const ang = baseAng + S.phi * u + .7 * Math.sin(i * S.w + S.ph);
+          step(f, Math.cos(ang) * mag * S.gain, Math.sin(ang) * mag * S.gain, RDT, S.g, true);
+          if (Math.hypot(f.x, f.z) > 10.5) { f.x = px; f.z = pz; f.vx = f.vz = 0; }
+          const ny = H(f.x, f.z) + .07;
+          futPos[o++] = px; futPos[o++] = py; futPos[o++] = pz;
+          futPos[o++] = f.x; futPos[o++] = ny; futPos[o++] = f.z;
+          px = f.x; pz = f.z; py = ny;
+        }
+      }
+      futGeo.attributes.position.needsUpdate = true;
+
+      // rings
+      for (const r of rings) {
+        if (r.userData.t >= 1) { r.material.opacity = 0; continue; }
+        r.userData.t = Math.min(1, r.userData.t + dt * 1.1);
+        const t = r.userData.t;
+        r.scale.setScalar(.25 + t * 1.6);
+        r.material.opacity = (1 - t) * .9;
+      }
+
+      // HUD
+      if (frameN % 5 === 0) {
+        const drift = Math.hypot(model.x - truth.x, model.z - truth.z);
+        hudD.textContent = drift.toFixed(2) + ' m';
+        hudDB.style.width = Math.min(100, drift / 1.2 * 100) + '%';
+        hudA.textContent = String(anchors).padStart(4, '0');
+      }
+
+      renderer.render(scene, camera);
+    }
+    tick();
+  </script>
+<div data-offline-bar="1" style="position: fixed; left: 0px; right: 0px; bottom: 0px; z-index: 99999; background: rgb(28, 28, 28); color: rgb(244, 241, 234); font: 14px / 1.4 Georgia, serif; padding: 8px 16px; text-align: center;">Offline copy. Not the live site. Saving…</div><div data-offline-bar="1" style="position: fixed; left: 0px; right: 0px; bottom: 0px; z-index: 99999; background: rgb(28, 28, 28); color: rgb(244, 241, 234); font: 14px / 1.4 Georgia, serif; padding: 8px 16px; text-align: center;">Offline copy. Not the live site. Saving…</div><div data-offline-bar="1" style="position: fixed; left: 0px; right: 0px; bottom: 0px; z-index: 99999; background: rgb(28, 28, 28); color: rgb(244, 241, 234); font: 14px / 1.4 Georgia, serif; padding: 8px 16px; text-align: center;">Offline copy. Not the live site. Saving…</div><div data-offline-bar="1" style="position: fixed; left: 0px; right: 0px; bottom: 0px; z-index: 99999; background: rgb(28, 28, 28); color: rgb(244, 241, 234); font: 14px / 1.4 Georgia, serif; padding: 8px 16px; text-align: center;">Offline copy. Not the live site. Saving…</div><div data-offline-bar="1" style="position: fixed; left: 0px; right: 0px; bottom: 0px; z-index: 99999; background: rgb(28, 28, 28); color: rgb(244, 241, 234); font: 14px / 1.4 Georgia, serif; padding: 8px 16px; text-align: center;">Offline copy. Not the live site. Saving…</div>
+
+
+</body></html>

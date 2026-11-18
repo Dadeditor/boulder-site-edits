@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Warp Core — Boulder Research</title>
+  <meta name="description" content="Warp Core runs a Godot game's rules and physics as GPU kernels across thousands of parallel copies. Includes the verification harness that checks the GPU copies against Godot and traces faults. Release status, demo, and how to pilot it." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="projects.css" />
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+    <nav class="nav">
+    <a href="index.html" class="brand" aria-label="Boulder Research home"></a>
+    <div class="nav-links mono">
+      <a href="index.html" class="hide-sm">Home</a>
+      <div class="nav-drop">
+        <a href="projects.html">Projects</a>
+        <button type="button" class="nav-drop-toggle" aria-expanded="false" aria-label="Show the Projects menu">▾</button>
+        <div class="nav-drop-menu">
+          <a href="project-warp-core.html" aria-current="page">Warp Core</a>
+          <a href="project-miniloader.html">Miniloader</a>
+          <a href="project-astrolabe.html">Astrolabe</a>
+          <a href="research.html">Research</a>
+        </div>
+      </div>
+      <a href="investors.html" class="hide-sm">Investors</a>
+      <a href="about.html" class="hide-sm">About</a>
+      <a class="btn" href="mailto:chris@kellogg.io?subject=Research">Get in touch</a>
+  </nav>
+  <script>
+  // T-439: a touchscreen has no hover, so the caret is a real button that
+  // pins the dropdown open on tap (the CSS reads .is-open). Hover still
+  // opens it for a mouse pointer.
+  (function () {
+    const drop = document.querySelector(".nav-drop");
+    const caret = drop && drop.querySelector(".nav-drop-toggle");
+    if (!caret) return;
+    caret.addEventListener("click", () => {
+      const open = drop.classList.toggle("is-open");
+      caret.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  })();
+  </script>
+
+  <header class="page-head">
+    <div class="wrap">
+      <div class="crumbs mono"><a href="index.html">Boulder Research</a> / <a href="projects.html">Projects</a> / Warp Core</div>
+      <p class="ship-note mono"><b>Project 01.</b> A prototype in pilots. The research behind it is in Research.</p>
+      <div class="status-bar mono">
+        <span class="status">Prototype · pilots open</span>
+        <span class="tag">Godot 4</span>
+        <span class="tag">GPU-parallel simulation</span>
+        <span class="tag">Verification &amp; fault tracing</span>
+      </div>
+      <h1>Warp Core.<br><span class="serif">Thousands of worlds, one GPU.</span></h1>
+      <p class="lede">Warp Core runs a Godot game's <b>rules and physics as GPU kernels</b>, one complete copy of the game per GPU lane, thousands of lanes at once. Godot stops being the bottleneck and becomes the window you watch any one copy through. Built in is the proof the copies are real: one set of rules, three backends that must agree, and a trace from any fault back to where it began.</p>
+      <div class="ctas">
+        <a class="btn" href="#engage">Become a design partner →</a>
+        <a class="btn ghost" href="#demo">See the demo</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 01 WHAT IT IS -->
+  <section class="alt" id="what">
+    <div class="wrap">
+      <div class="sec-head mono"><span>01 / What it is</span><span>The engine is the window</span></div>
+      <div class="split">
+        <div>
+          <h2>Run the game<br><span class="serif">a thousand times.</span></h2>
+          <p class="body">Testing a game is limited by how many play sessions you can afford. A human plays one. A scripted bot needs a whole engine instance per session, with all of its memory and CPU cost.</p>
+          <p class="body">Warp Core changes the unit of cost. Each copy holds only the state that changes, about <b>10 KB per world</b>. Meshes, textures and level geometry are stored once and shared, so <b>4,096 worlds fit in about 41 MB</b>. We first proved the idea by running a whole commercial console game as GPU kernels; Warp Core brings it to a modern, open engine.</p>
+        </div>
+        <div class="features">
+          <div><span class="mono">Parallel worlds</span><p><b>Thousands of independent copies</b> of the same scene step together. Each can take different inputs and branch from any saved state.</p></div>
+          <div><span class="mono">Shared assets</span><p><b>Cost scales with game state</b>, not with the engine. Adding a world means adding a save file, not another engine.</p></div>
+          <div><span class="mono">Godot in the loop</span><p><b>A Godot save can be loaded into a GPU lane</b> and resumed, and any lane can be watched live in Godot. Developers keep their engine and workflow.</p></div>
+          <div><span class="mono">Fixed state layout</span><p>A <b>77-field game state in 13 blocks</b> (transforms, bodies, camera, input, contacts and more), generated from one specification.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 STATUS -->
+  <section id="status">
+    <div class="wrap">
+      <div class="sec-head mono"><span>02 / Release status</span><span>Updated November 2026</span></div>
+      <div class="split">
+        <h2>Prototype.<br><span class="serif">Measured, not projected.</span></h2>
+        <p class="body">Warp Core works end to end on a deliberately simple test scene: one physics body, a door and a trigger zone. That makes it a proof of the architecture, not a figure for a shipping game. We're opening pilots now to move it onto real games.</p>
+      </div>
+      <div class="stages">
+        <div class="stage done"><span class="mono">Done</span><b>Research</b><p>A whole console game run as GPU kernels, one console per lane.</p></div>
+        <div class="stage now"><span class="mono">We are here</span><b>Prototype</b><p>Godot test scene on the GPU, all verification gates passing. Used by us inside pilots.</p></div>
+        <div class="stage"><span class="mono">Next</span><b>Pilot</b><p>A small, complete Godot game with several bodies and declared script state.</p></div>
+        <div class="stage"><span class="mono">Later</span><b>Generally available</b><p>Managed testing first, then a plugin and CI integration.</p></div>
+      </div>
+      <div class="ledger" style="margin-top:40px">
+        <div>
+          <h3>Proven today</h3>
+          <ul>
+            <li>5,052,188 world-steps per second at 4,096 worlds on four consumer AMD GPUs.</li>
+            <li>Bit-identical to Godot over 23,820 steps and 144 restarts, on 30 of the 77 state fields.</li>
+            <li>A Godot save resumed on the GPU is exact at the moment of resume, and within 0.006 afterward.</li>
+            <li>Every one of 4,096 worlds matches a single-world run.</li>
+            <li>10 of 10 injected bug classes traced to the correct variable, and GPU, NumPy and GDScript backends bit-identical on the tested rules.</li>
+            <li>About 1 µs to publish a frame to Godot and 0.8 µs to read one, with zero torn frames in 10,000 reads against a live writer.</li>
+          </ul>
+        </div>
+        <div class="open">
+          <h3>Not yet proven</h3>
+          <ul>
+            <li>Throughput on a real game with many objects. The kernel models one contact at a time today.</li>
+            <li>Game scripts don't run on the GPU. Script variables must be declared as simulation state; 37 of 77 fields are still written by scripts.</li>
+            <li>Collision events land one step late (74 contacts against Godot's 78 over 120 steps).</li>
+            <li>Fault tracing is shown on bugs we inject. Finding real, unseeded bugs in a partner's game is the next test.</li>
+            <li>Rules are compiled, game scripts are not: they must be declared as simulation state to take part. Godot's own save data covers 55 fields, so 22 can't be compared yet.</li>
+            <li>No head-to-head benchmark yet against many headless Godot instances on the same hardware.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 DEMO -->
+  <section class="dark" id="demo">
+    <div class="wrap">
+      <div class="sec-head mono"><span>03 / Demo</span><span>A ball, a door, 4,096 worlds</span></div>
+      <div class="split">
+        <figure class="shot">
+          <img src="warp-viewer.png" alt="Godot window showing an orange ball, a blue door, and numbers read from GPU memory" />
+          <figcaption class="mono">Godot drawing world 0, streamed live from the GPU. The readout (tick, position, speed, door state) is copied from that world's memory, not computed by Godot.</figcaption>
+        </figure>
+        <div>
+          <h2>Godot is<br><span class="serif">just the TV.</span></h2>
+          <p class="body">In the demo, the GPU steps 4,096 copies of a small scene at once. Godot reads one of them through shared memory and draws it. It doesn't simulate anything: stop the GPU and the window freezes.</p>
+          <p class="body">Think of 4,096 consoles sharing one cartridge, each with its own save file. Godot is the TV plugged into console zero. We run the demo live on calls with design partners and investors.</p>
+          <div class="ctas" style="margin-top:24px">
+            <a class="btn" href="mailto:chris@kellogg.io?subject=Warp%20Core%20demo">Book a live demo →</a>
+            <a class="btn ghost" href="#verify">How it's checked</a>
+          </div>
+        </div>
+      </div>
+      <div class="figs" style="margin-top:64px">
+        <div class="fig-n"><div class="n">5.05<small>M</small></div><p>World-steps per second at 4,096 worlds, on the test scene.</p></div>
+        <div class="fig-n"><div class="n">~84<small>K</small></div><p>Copies of the scene at real-time speed, at a 60 Hz game tick.</p></div>
+        <div class="fig-n"><div class="n">41<small>MB</small></div><p>GPU memory for 4,096 worlds of changing state.</p></div>
+        <div class="fig-n"><div class="n">10<small>KB</small></div><p>State per world. Everything read-only is stored once.</p></div>
+      </div>
+      <p class="note mono">Figures are from the Warp Core technical report, measured on four AMD GPUs on a minimal test scene. They show the architecture works, not the speed of a shipping game.</p>
+    </div>
+  </section>
+
+  <!-- 04 VERIFY -->
+  <section class="alt" id="verify">
+    <div class="wrap">
+      <div class="sec-head mono"><span>04 / Verification</span><span>Proof the copies are real</span></div>
+      <div class="split">
+        <div>
+          <h2>Same rules,<br><span class="serif">three calculators.</span></h2>
+          <p class="body">Thousands of GPU copies of a game are only useful if they behave like the game. Anyone can make a fast demo; the hard part is knowing the fast copy hasn't quietly drifted from the real one. Warp Core answers that by construction: every rule is written once and compiled three ways, and the three must give the same answer.</p>
+          <p class="body">Because every rule declares what it reads and writes, Warp Core also knows how the game's state depends on itself. When a world goes wrong, that dependency graph leads back to the variable where the fault started. Two independent adversarial audits rejected an early sign-off; every finding was fixed or explicitly scoped out.</p>
+        </div>
+        <div class="features">
+          <div><span class="mono">Declare once</span><p>A rule states what it reads, what it writes and its logic. It compiles to <b>GPU kernels, to NumPy as a reference, and to GDScript</b> to run inside Godot. All three are bit-identical on the tested rules.</p></div>
+          <div><span class="mono">Derived scheduling</span><p>Rule order, per-step change tracking and the causal graph are <b>calculated from the declarations</b>, not maintained by hand. Switching over found three real dependency errors in the hand-written tables.</p></div>
+          <div><span class="mono">Fault-tracing gates</span><p>Automated tests inject known classes of game bug, such as update-order errors, collision gaps, timer overflow and precision loss, and check each is <b>traced to the right variable</b>.</p></div>
+          <div><span class="mono">Live transport</span><p>A Godot extension reads GPU state through <b>lock-free shared memory</b>. A step is only visible once it's complete, so Godot never draws a half-written frame.</p></div>
+        </div>
+      </div>
+      <div class="split" style="margin-top:48px">
+        <div>
+          <h3>Break it on purpose</h3>
+          <p class="body">One command runs every gate: the three backends are compared step by step, then planted bugs (a bounce that's too bouncy, a door that never opens) are injected and the harness has to name the exact wrong variable. It writes a pass/fail report. A second command opens the live Godot viewer on the same simulation.</p>
+          <pre class="cmd"><span class="c"># run every gate, write a pass/fail report</span>
+python -m conduit.cli gates</pre>
+          <p class="note mono">Run by us during pilots and live demos. The harness isn't publicly released; it's included in every pilot, and access for your own simulation is available by request.</p>
+        </div>
+      </div>
+      <div class="figs" style="margin-top:48px">
+        <div class="fig-n"><div class="n">10<small>/10</small></div><p>Injected bug classes traced to the right variable.</p></div>
+        <div class="fig-n"><div class="n">3</div><p>Backends from one rule: GPU, NumPy, GDScript.</p></div>
+        <div class="fig-n"><div class="n">~1<small>µs</small></div><p>To publish a GPU frame to Godot.</p></div>
+        <div class="fig-n"><div class="n">0<small>torn</small></div><p>Half-written frames in 10,000 live reads.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 USAGE -->
+  <section class="alt" id="usage">
+    <div class="wrap">
+      <div class="sec-head mono"><span>05 / Usage</span><span>What a pilot looks like</span></div>
+      <div class="split">
+        <div>
+          <h2>From your scene<br><span class="serif">to a findings report.</span></h2>
+          <p class="body">Today Warp Core is used hands-on, with us. You keep your game in Godot; we do the porting and run the worlds. Automated bug-hunting agents that explore the lanes on their own are in development and will join pilots as they're ready.</p>
+        </div>
+        <ol class="steps">
+          <li><div><b>Scope</b><p>Pick a scene or subsystem where bugs are rare, costly or hard to reproduce: physics, collisions, timers, doors and triggers.</p></div></li>
+          <li><div><b>Declare state &amp; port rules</b><p>We declare the scene's changing state and move its rules onto the GPU. Script variables that matter are declared as simulation state.</p></div></li>
+          <li><div><b>Gate it</b><p>Warp Core's gates check the GPU copies against Godot itself before any result counts.</p></div></li>
+          <li><div><b>Run thousands of worlds</b><p>Varied inputs, branches from saved states, and faults injected on purpose, all in parallel.</p></div></li>
+          <li><div><b>Deliver findings</b><p>Each finding comes with a fault trace to the variable where it began, a state snapshot to load in Godot, and a replay.</p></div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 ENGAGE -->
+  <section id="engage">
+    <div class="wrap">
+      <div class="sec-head mono"><span>06 / Buy or engage</span><span>Three ways in</span></div>
+      <h2>Work with us<br><span class="serif">on Warp Core.</span></h2>
+      <div class="offers" style="margin-top:40px">
+        <div class="offer">
+          <div class="mono num">01</div>
+          <h3>Design-partner pilot</h3>
+          <div class="who">for Godot studios</div>
+          <p>We port a scene from your game, gate it against Godot, run it at scale and hand you a findings report with fault traces. Includes the verification gates and live viewer on your scene. Your feedback shapes the product.</p>
+          <div class="terms"><span class="mono">Terms</span>Scoped per studio. Paid pilots, priced on the size of the scene and the length of the run.</div>
+          <a class="btn" href="mailto:chris@kellogg.io?subject=Warp%20Core%20design%20partner">Apply →</a>
+        </div>
+        <div class="offer">
+          <div class="mono num">02</div>
+          <h3>Simulation capacity</h3>
+          <div class="who">for agent &amp; world-model teams</div>
+          <p>Thousands of exact, labeled game states per second: training and evaluation data, and a ground truth to check learned predictions against.</p>
+          <div class="terms"><span class="mono">Terms</span>Custom engagement. Tell us the world and the volume you need.</div>
+          <a class="btn ghost" href="mailto:chris@kellogg.io?subject=Warp%20Core%20simulation%20capacity">Enquire →</a>
+        </div>
+        <div class="offer">
+          <div class="mono num">03</div>
+          <h3>Investors</h3>
+          <div class="who">for the full picture</div>
+          <p>The Warp Core technical paper and investor brief, with the measured results, the known limits and the plan to close them.</p>
+          <div class="terms"><span class="mono">Terms</span>Shared on request.</div>
+          <a class="btn ghost" href="mailto:chris@kellogg.io?subject=Warp%20Core%20brief%20and%20paper">Request the brief →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 ROADMAP -->
+  <section class="alt" id="roadmap">
+    <div class="wrap">
+      <div class="sec-head mono"><span>07 / What's next</span><span>Prototype → pilot</span></div>
+      <div class="split">
+        <h2>Closing the<br><span class="serif">known gaps.</span></h2>
+        <ol class="steps">
+          <li><div><b>Benchmark against the baseline</b><p>Warp Core against many headless Godot instances on equal hardware, with a published cost per million game-steps.</p></div></li>
+          <li><div><b>A real game</b><p>A small but complete Godot game with multiple bodies, multi-contact collisions and declared script state, re-run through every gate.</p></div></li>
+          <li><div><b>Close the gaps</b><p>Fix collision timing and extend checked coverage beyond 30 of the 77 fields.</p></div></li>
+          <li><div><b>Plugin &amp; CI</b><p>A Godot plugin and CI step that run the verification gates on every build and flag regressions with a trace. <a href="mailto:chris@kellogg.io?subject=Warp%20Core%20plugin%20waitlist">Join the list</a>.</p></div></li>
+          <li><div><b>An exploration agent</b><p>Search and reinforcement learning across the parallel lanes, finding seeded and real bugs on its own.</p></div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 RESEARCH -->
+  <section id="research" aria-labelledby="research-title">
+    <div class="wrap">
+      <div class="sec-head mono"><span>08 / The research behind it</span><span>Nine essays, grouped by topic</span></div>
+      <div class="split">
+        <h2 id="research-title">Research feeds<br><span class="serif">this project.</span></h2>
+        <div>
+          <p class="body">The decisions in Warp Core came out of essays on the Research track: where the engine stops and the kernel starts, the state contract that makes 4,096 copies fit, the parity gates, the GPU measurements, and the audits that overturned a sign-off we had already given.</p>
+          <div class="research-links mono">
+            <b>Read the research</b>
+            <a href="research.html">All nine essays</a>
+            <a href="research-engine-is-the-window.html">The engine is the window</a>
+            <a href="research-engine-as-kernels.html">The engine can't go in the kernel</a>
+            <a href="research-rules-and-faults.html">Rules declared once</a>
+            <a href="research-gap-or-wall.html">A gap you can close</a>
+            <a href="research-four-gpus.html">Four GPUs, measured</a>
+            <a href="research-two-audits.html">The test passed. The claim was still wrong.</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta" id="contact">
+    <div class="wrap">
+      <h2>Run your game<br><span class="serif">a thousand times.</span></h2>
+      <p class="body">Fast is easy. Correct is the product.</p>
+      <div class="ctas">
+        <a class="btn" href="mailto:chris@kellogg.io?subject=Warp%20Core%20design%20partner">Become a design partner →</a>
+        <a class="btn ghost" href="projects.html">All projects</a>
+      </div>
+      <footer class="mono">
+        <span>© 2026 Boulder Research</span>
+        <a href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+        <span class="portfolio-links">Portfolio: <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person</a> · <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware</a></span>
+        <span>Warp Core · Prototype</span>
+      </footer>
+    </div>
+  </section>
+</body>
+</html>

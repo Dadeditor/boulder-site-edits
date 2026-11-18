@@ -1,0 +1,106 @@
+/* Research blog styles (research.html and research-*.html articles).
+   Load after projects.css: it reuses the same tokens, nav, headings and
+   footer, and adds the index list and long-form article typography. */
+
+/* ---------- INDEX ---------- */
+.topic { display: grid; grid-template-columns: 280px 1fr; gap: clamp(24px, 4vw, 64px); padding: 28px 0 40px; border-top: 1.5px solid var(--ink); }
+.topic + .topic { margin-top: 8px; }
+.topic-head h2 { font-size: clamp(30px, 3.2vw, 46px); margin: 10px 0 12px; }
+.topic-head p { margin: 0; color: var(--ink-2); font-size: 15px; line-height: 1.55; }
+.topic-head .mono { color: var(--predict); }
+/* Each topic names the project it feeds (T-432): research is upstream of the
+   products, and the index says so. */
+.topic-head .topic-feeds { color: var(--muted); font-size: 12px; letter-spacing: .06em; margin-bottom: 10px; }
+.topic-head .topic-feeds a { color: var(--predict); text-decoration: none; }
+.topic-head .topic-feeds a:hover { color: var(--ink); }
+.entries { list-style: none; margin: 0; padding: 0; }
+.entry { border-bottom: 1px dashed var(--rule); }
+.entry:first-child a { padding-top: 6px; }
+.entry a { display: grid; grid-template-columns: 130px 1fr; gap: 20px; padding: 18px 0 20px; text-decoration: none; }
+.entry time { color: var(--muted); padding-top: 6px; }
+.entry h3 { font-size: 26px; margin: 0 0 6px; transition: color .2s; }
+.entry a:hover h3 { color: var(--predict); }
+.entry .dek { font-family: var(--serif); font-style: italic; font-size: 20px; color: var(--ink-2); margin: 0 0 8px; line-height: 1.3; }
+.entry .meta { color: var(--muted); }
+
+/* ---------- ARTICLE ---------- */
+.article-head { padding: clamp(48px, 9vh, 104px) 0 40px; border-bottom: 1px solid var(--rule); }
+.article-head h1 { font-size: clamp(44px, 6.4vw, 104px); max-width: 1100px; }
+.article-head .dek { margin: 24px 0 28px; max-width: 760px; font-family: var(--serif); font-size: clamp(22px, 2vw, 30px); line-height: 1.25; color: var(--ink-2); }
+.byline { display: flex; flex-wrap: wrap; gap: 8px 22px; color: var(--muted); }
+.byline b { color: var(--ink); font-weight: 500; }
+
+.article-body { display: grid; grid-template-columns: 220px minmax(0, 720px); gap: clamp(28px, 5vw, 88px); padding: 56px 0 96px; }
+.toc { position: sticky; top: 92px; align-self: start; }
+.toc ol { list-style: none; margin: 12px 0 0; padding: 0; border-top: 1.5px solid var(--ink); counter-reset: t; }
+.toc li { counter-increment: t; border-bottom: 1px dashed var(--rule); }
+.toc a { display: grid; grid-template-columns: 28px 1fr; padding: 9px 0; text-decoration: none; color: var(--ink-2); font-size: 13.5px; line-height: 1.35; }
+.toc a::before { content: "0" counter(t); font-family: var(--mono); font-size: 10.5px; color: var(--muted); padding-top: 2px; }
+.toc a:hover { color: var(--predict); }
+
+.prose { font-size: 18px; line-height: 1.68; color: var(--ink-2); }
+.prose > :first-child { margin-top: 0; }
+.prose p { margin: 0 0 20px; }
+.prose b, .prose strong { color: var(--ink); font-weight: 650; }
+.prose h2 { font-size: clamp(30px, 3vw, 44px); margin: 56px 0 18px; padding-top: 18px; border-top: 1.5px solid var(--ink); color: var(--ink); scroll-margin-top: 90px; }
+.prose h3 { font-size: 21px; margin: 34px 0 10px; color: var(--ink); }
+.prose a { color: var(--predict); }
+.prose code { font-family: var(--mono); font-size: .82em; background: var(--paper-2); padding: 1px 5px; border: 1px solid var(--rule); }
+.prose ul, .prose ol { margin: 0 0 20px; padding-left: 22px; }
+.prose li { margin-bottom: 8px; }
+.prose .eq { display: block; margin: 22px 0; padding: 14px 18px; border-left: 3px solid var(--predict); background: var(--paper-2); font-family: var(--mono); font-size: 14.5px; color: var(--ink); overflow-x: auto; }
+.prose blockquote { margin: 28px 0; padding: 0 0 0 22px; border-left: 3px solid var(--ink); font-family: var(--serif); font-style: italic; font-size: 25px; line-height: 1.3; color: var(--ink); }
+.prose .callout { margin: 28px 0; padding: 18px 20px; border: 1.5px solid var(--ink); background: var(--paper); font-size: 16px; line-height: 1.6; }
+.prose .callout .mono { display: block; color: var(--fault); margin-bottom: 8px; }
+
+.prose figure.table { margin: 30px 0; overflow-x: auto; }
+/* Figures drawn by scripts/figures/build-figures.mjs (T-419). They are SVG
+   assets staged alongside the pages, set in mono so the numbers on them read
+   like the arithmetic in the article. */
+.prose figure.figure { margin: 30px 0; border: 1.5px solid var(--ink); background: var(--paper); padding: 14px 16px; }
+.prose figure.figure img { display: block; width: 100%; }
+.prose figure.figure figcaption { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+.prose table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.45; }
+.prose th { text-align: left; font-family: var(--mono); font-size: 10.5px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 10px 12px 10px 0; border-bottom: 1.5px solid var(--ink); }
+.prose td { padding: 10px 12px 10px 0; border-bottom: 1px dashed var(--rule); vertical-align: top; }
+.prose td.n { font-family: var(--mono); font-size: 13.5px; color: var(--ink); white-space: nowrap; }
+.prose figcaption { margin-top: 10px; color: var(--muted); font-family: var(--mono); font-size: 11px; letter-spacing: .04em; line-height: 1.6; }
+
+.article-foot { border-top: 1.5px solid var(--ink); padding: 22px 0 0; margin-top: 56px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; }
+.article-foot a { color: var(--ink-2); }
+.source { color: var(--muted); font-size: 14.5px; line-height: 1.6; margin-top: 40px; }
+
+@media (max-width: 980px) {
+  .topic, .article-body { grid-template-columns: 1fr; }
+  .toc { position: static; }
+  .entry a { grid-template-columns: 1fr; gap: 6px; }
+  .entry time { padding-top: 0; }
+}
+
+/* slim dark footer band for research pages */
+.cta.slim { padding: 8px 0 40px; }
+.cta.slim footer { margin-top: 0; border-top: 0; }
+
+/* ---------- INVESTOR TRACK ----------
+   Investor materials are a separate, clearly labelled track: a dashed box
+   on the research index, and investors.html. Never styled like an article. */
+.track { padding: 72px 0; }
+.track-box { border: 1.5px dashed var(--ink); padding: clamp(22px, 3vw, 36px); display: grid; gap: 14px; justify-items: start; max-width: 860px; }
+.track-box h2 { font-size: clamp(30px, 3.2vw, 46px); margin: 0; }
+.track-box p { margin: 0; color: var(--ink-2); font-size: 16px; line-height: 1.55; max-width: 640px; }
+.track-label { color: var(--fault); }
+.doc-list { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--ink); }
+.doc { display: grid; grid-template-columns: 200px 1fr; gap: clamp(16px, 3vw, 40px); padding: 26px 0 28px; border-bottom: 1px dashed var(--rule); }
+.doc .tag { color: var(--fault); }
+.doc .tag span { display: block; color: var(--muted); margin-top: 6px; }
+.doc h3 { font-size: 28px; margin: 0 0 8px; }
+.doc h3 a { text-decoration: none; }
+.doc h3 a:hover { color: var(--predict); }
+.doc p { margin: 0 0 10px; color: var(--ink-2); font-size: 15.5px; line-height: 1.55; max-width: 720px; }
+.doc .reads { color: var(--muted); font-size: 14px; }
+.doc .reads a { color: var(--predict); }
+@media (max-width: 980px) { .doc { grid-template-columns: 1fr; gap: 8px; } }
+.page-head .track-label { display: block; margin: -8px 0 18px; }
+
+/* Draft articles built from content/research/ with "draft: true". */
+.draft-banner { display: inline-block; margin-bottom: 18px; padding: 4px 10px; border: 1.5px dashed var(--fault); color: var(--fault); }

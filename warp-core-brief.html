@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boulder Research — Warp Core Investment Brief</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #efede7;
+      --paper-2: #e6e3db;
+      --ink: #0b0b0c;
+      --ink-2: #3a3a3d;
+      --muted: #75736d;
+      --rule: rgba(11, 11, 12, .16);
+      --predict: #2b4bff;
+      --fault: #ff3d2e;
+      --display: "Archivo", "Arial Narrow", sans-serif;
+      --serif: "Instrument Serif", Georgia, serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body {
+      margin: 0;
+      background: #d9d6ce;
+      color: var(--ink);
+      font-family: var(--display);
+      font-size: 13.5px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .page {
+      width: 8.5in;
+      min-height: 11in;
+      margin: 32px auto;
+      padding: .6in .7in .5in;
+      background: var(--paper);
+      box-shadow: 0 10px 40px rgba(0,0,0,.12);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .runner {
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: 10px;
+      margin-bottom: 22px;
+      border-bottom: 1.5px solid var(--ink);
+    }
+    .folio { margin-top: auto; padding-top: 8px; display: flex; justify-content: space-between; color: var(--muted); }
+    .mono { font-family: var(--mono); font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; }
+    .serif { font-family: var(--serif); font-weight: 400; font-style: italic; }
+    .blue { color: var(--predict); }
+
+    h1 {
+      margin: 0;
+      font-size: 76px;
+      line-height: .86;
+      font-weight: 850;
+      font-variation-settings: "wdth" 72;
+      text-transform: uppercase;
+    }
+    h1 .serif { text-transform: none; font-size: 1.04em; letter-spacing: -.02em; }
+    h2 {
+      margin: 0 0 12px;
+      font-size: 30px;
+      line-height: .95;
+      font-weight: 850;
+      font-variation-settings: "wdth" 74;
+      text-transform: uppercase;
+    }
+    h2 .serif { text-transform: none; font-size: 1.06em; }
+    h3 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      font-weight: 800;
+      font-variation-settings: "wdth" 82;
+      text-transform: uppercase;
+      letter-spacing: .01em;
+    }
+    p { margin: 0 0 10px; color: var(--ink-2); }
+    p b, li b { color: var(--ink); font-weight: 650; }
+    .sec { margin-bottom: 22px; break-inside: avoid; }
+    .tight .sec { margin-bottom: 12px; }
+    .sec-n { color: var(--predict); margin-bottom: 8px; }
+    .lead { font-size: 16px; line-height: 1.5; color: var(--ink); }
+    .pull {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 26px;
+      line-height: 1.15;
+      margin: 18px 0;
+      padding-left: 16px;
+      border-left: 3px solid var(--predict);
+      color: var(--ink);
+    }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+    .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+    /* cover */
+    .cover { justify-content: space-between; background: var(--ink); color: var(--paper); }
+    .cover .runner { border-color: var(--paper); color: rgba(239,237,231,.6); }
+    .cover-logo { width: 150px; }
+    .cover h1 { color: var(--paper); font-size: 84px; }
+    .cover h1 .serif { color: #8fa3ff; }
+    .cover .sub { font-size: 18px; line-height: 1.5; color: rgba(239,237,231,.75); max-width: 5.6in; margin: 22px 0 0; }
+    .ask {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid rgba(239,237,231,.3);
+      border-bottom: 1px solid rgba(239,237,231,.3);
+    }
+    .ask div { padding: 16px 14px 18px 0; }
+    .ask div + div { padding-left: 14px; border-left: 1px solid rgba(239,237,231,.2); }
+    .ask .mono { color: rgba(239,237,231,.5); margin-bottom: 6px; }
+    .ask b { display: block; font-size: 30px; font-weight: 850; font-variation-settings: "wdth" 70; line-height: 1; }
+    .ask span.s { font-size: 12px; color: rgba(239,237,231,.6); }
+    .cover .folio { color: rgba(239,237,231,.45); }
+
+    /* summary box */
+    .box { border: 1.5px solid var(--ink); padding: 18px 20px; margin: 4px 0 24px; background: rgba(255,255,255,.3); }
+    .box ul { margin: 0; padding: 0; list-style: none; }
+    .box li { padding: 7px 0 7px 22px; border-bottom: 1px dashed var(--rule); position: relative; color: var(--ink-2); }
+    .box li:last-child { border-bottom: 0; }
+    .box li::before { content: "→"; position: absolute; left: 0; font-family: var(--mono); color: var(--predict); }
+
+    /* tables */
+    table { width: 100%; border-collapse: collapse; margin: 6px 0 14px; font-size: 13px; }
+    th { text-align: left; font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 500; padding: 8px 10px 8px 0; border-bottom: 1.5px solid var(--ink); }
+    td { padding: 7px 10px 7px 0; border-bottom: 1px solid var(--rule); vertical-align: top; color: var(--ink-2); }
+    td b { color: var(--ink); }
+    td.num { font-family: var(--mono); font-size: 12px; color: var(--ink); white-space: nowrap; }
+    .cap { color: var(--muted); margin-top: -4px; margin-bottom: 8px; }
+
+    /* stats */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1.5px solid var(--ink); border-left: 1px solid var(--rule); margin: 8px 0 18px; }
+    .stat { padding: 14px 14px 16px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+    .stat .n { font-size: 38px; font-weight: 850; font-variation-settings: "wdth" 70; line-height: 1; }
+    .stat .n small { font-size: .45em; margin-left: 3px; }
+    .stat p { font-size: 12px; line-height: 1.45; margin: 8px 0 0; }
+
+    /* map */
+    .map { border-top: 1.5px solid var(--ink); }
+    .map-row { display: grid; grid-template-columns: 28px 1fr 1fr; gap: 18px; padding: 8px 0; border-bottom: 1px solid var(--rule); break-inside: avoid; }
+    .map-row .idx { font-family: var(--mono); font-size: 11px; color: var(--predict); padding-top: 2px; }
+    .map-row p { margin: 0; font-size: 13px; }
+    .map-row .paper { font-family: var(--serif); font-style: italic; font-size: 16px; line-height: 1.25; color: var(--ink); }
+    .map-row .paper .mono { display: block; font-style: normal; color: var(--muted); margin-bottom: 4px; font-family: var(--mono); }
+    .map-row .paper .mono.fix { color: var(--predict); }
+
+    /* funds */
+    .fund-bar { display: flex; height: 26px; margin: 12px 0 6px; border: 1.5px solid var(--ink); }
+    .fund-bar i { display: block; height: 100%; border-right: 1.5px solid var(--paper); }
+    .legend-row { display: flex; align-items: center; gap: 10px; }
+    .sw { width: 12px; height: 12px; display: inline-block; flex: none; }
+    .timeline { border-top: 1.5px solid var(--ink); display: grid; grid-template-columns: 1fr 1fr; column-gap: 28px; }
+    .tl { padding: 10px 0; border-bottom: 1px solid var(--rule); break-inside: avoid; }
+    .tl .when { font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--predict); margin-bottom: 4px; }
+    .tl ul { margin: 4px 0 0; padding-left: 16px; color: var(--ink-2); font-size: 13px; }
+    .tl li { margin: 2px 0; }
+
+    .claims { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .claims ul { margin: 0; padding-left: 16px; font-size: 13px; color: var(--ink-2); }
+    .claims li { margin: 3px 0; }
+    .tag { display: inline-block; font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; padding: 3px 6px; border: 1px solid currentColor; margin-bottom: 10px; }
+
+    .person h3 { font-size: 22px; font-variation-settings: "wdth" 74; margin-bottom: 0; }
+    .person .role { font-family: var(--serif); font-style: italic; color: var(--predict); font-size: 17px; margin-bottom: 8px; }
+    .person ul { margin: 0; padding-left: 16px; font-size: 13px; color: var(--ink-2); }
+    .person li { margin: 3px 0; }
+
+    .closing { background: var(--ink); color: var(--paper); padding: 20px 24px; margin-top: 4px; }
+    .closing h2 { color: var(--paper); margin-bottom: 10px; }
+    .closing h2 .serif { color: #8fa3ff; }
+    .closing p { color: rgba(239,237,231,.72); margin: 0; }
+
+    /* figure */
+    .fig { border: 1.5px solid var(--ink); margin: 6px 0 8px; background: #16171c; }
+    .fig img { display: block; width: 100%; height: 310px; object-fit: cover; object-position: center top; }
+    .domains { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1.5px solid var(--ink); border-left: 1px solid var(--rule); margin: 8px 0 14px; }
+    .domains div { padding: 12px 12px 14px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+    .domains h3 { font-size: 13px; margin-bottom: 4px; }
+    .domains p { font-size: 12px; line-height: 1.45; margin: 0; }
+    .domains .mono { color: var(--predict); margin-bottom: 6px; }
+
+    .draft { color: var(--fault); }
+    svg text { font-family: var(--mono); }
+
+    @page { size: letter; margin: 0; }
+    @media print {
+      body { background: var(--paper); }
+      .page { margin: 0; box-shadow: none; width: 8.5in; height: 11in; min-height: 0; overflow: hidden; break-after: page; }
+      .page:last-child { break-after: auto; }
+    }
+    /* Investor-track label (screen only; hidden when printed) */
+    .track-bar { position: sticky; top: 0; z-index: 10; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 18px; padding: 10px 18px; background: var(--ink); color: var(--paper); font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+    .track-bar b { color: #ff3d2e; font-weight: 500; }
+    .track-bar a { color: #8fa3ff; }
+    @media print { .track-bar { display: none; } }
+  </style>
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+<div class="track-bar"><span><b>Investor track</b> · Draft for discussion · <a href="investors.html">All investor materials</a></span><span>Technical detail in Research: <a href="research-engine-is-the-window.html">The engine is the window</a> · <a href="research-gap-or-wall.html">A gap or a wall</a> · <a href="research.html#simulation">all simulation articles</a></span></div>
+
+<!-- ============ COVER ============ -->
+<section class="page cover">
+  <div>
+    <div class="runner mono"><span>Boulder Research</span><span>Warp Core · Investment brief · Pre-seed</span></div>
+    <img class="cover-logo" src="logo-paper.png" alt="Boulder Research" />
+  </div>
+  <div>
+    <div class="mono" style="color:#8fa3ff;margin-bottom:18px">Warp Core</div>
+    <h1>Thousands<br>of worlds.<br><span class="serif">One GPU at a time.</span></h1>
+    <p class="sub">We turned a game engine's rules and physics into GPU kernels, so thousands of independent copies of a world run at once and every fault traces back to its source. We're raising $500,000 to take it from a working prototype to a simulation platform, starting with Godot and expanding to other engines and to world simulation beyond games.</p>
+  </div>
+  <div>
+    <div class="ask">
+      <div><div class="mono">Raising</div><b>$500K</b><span class="s">Pre-seed</span></div>
+      <div><div class="mono">Runway</div><b>18 mo</b><span class="s">To seed-ready evidence</span></div>
+      <div><div class="mono">Measured</div><b>5.05M</b><span class="s">World-steps per second</span></div>
+      <div><div class="mono">Hardware</div><b>4 GPUs</b><span class="s">Consumer AMD cards</span></div>
+    </div>
+    <div class="folio mono"><span>boulderresearch.ai</span><span>October 2026 · Draft for discussion</span></div>
+  </div>
+</section>
+
+<!-- ============ PAGE 2: SUMMARY ============ -->
+<section class="page">
+  <div class="runner mono"><span>Boulder Research</span><span>01 · Summary</span></div>
+
+  <div class="sec">
+    <div class="sec-n mono">01 / The short version</div>
+    <h2>We ran Mario as GPU kernels.<br><span class="serif">Now we're doing it to a game engine.</span></h2>
+    <p class="lead">Super Mario World already runs entirely as GPU kernels in our lab: one console per GPU lane, thousands of consoles at once. <b>Warp Core</b> brings that idea to Godot, a modern open-source engine. The world's rules and physics run on the GPU across thousands of copies, and Godot becomes the window you watch one of them through.</p>
+    <div class="box">
+      <ul>
+        <li><b>Warp Core</b> is the architecture. Game state is a fixed memory layout, rules and physics are GPU kernels, and one world runs per lane. Read-only assets (meshes, textures, levels) are stored once and shared, so each extra world costs about 10 KB.</li>
+        <li><b>Warp Core's verification harness</b> is what makes it trustworthy. Each rule is written once and compiled to the GPU, to a Python reference and to Godot's own scripting language. Automated gates prove the copies agree, and live state streams into a running Godot window through shared memory.</li>
+        <li><b>It already works.</b> We measured 5,052,188 world-steps per second on four consumer GPUs, bit-identical agreement over 23,820 steps, and ten out of ten injected bug classes traced to their source.</li>
+        <li><b>The ask.</b> <b>$500K</b> over 18 months to close the prototype's known gaps, translate real game logic automatically, ship a Godot testing and simulation product, and extend the core to a second engine.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-n mono">02 / How the split works</div>
+    <h2>The simulation moves to the GPU.<br><span class="serif">The engine becomes the screen.</span></h2>
+    <svg viewBox="0 0 700 190" width="100%" aria-label="Mario and Godot architecture comparison">
+      <g font-size="10" fill="#75736d" letter-spacing="1">
+        <text x="0" y="12">SUPER MARIO WORLD (DONE)</text>
+        <text x="370" y="12">GODOT · WARP CORE (WORKING PROTOTYPE)</text>
+      </g>
+      <line x1="0" y1="20" x2="330" y2="20" stroke="#0b0b0c" stroke-width="1.5"/>
+      <line x1="370" y1="20" x2="700" y2="20" stroke="#0b0b0c" stroke-width="1.5"/>
+      <g font-size="11" fill="#0b0b0c">
+        <rect x="0" y="34" width="330" height="34" fill="none" stroke="#0b0b0c"/>
+        <text x="12" y="55">Game program, recompiled</text>
+        <rect x="0" y="80" width="330" height="54" fill="#2b4bff"/>
+        <text x="12" y="101" fill="#efede7" font-weight="600">GPU · 4,096 consoles, one per lane</text>
+        <text x="12" y="121" fill="#c9d1ff">ROM shared once · state per lane</text>
+        <rect x="0" y="146" width="330" height="34" fill="none" stroke="#0b0b0c" stroke-dasharray="4 3"/>
+        <text x="12" y="167">Emulated picture chip draws one lane</text>
+
+        <rect x="370" y="34" width="330" height="34" fill="none" stroke="#0b0b0c"/>
+        <text x="382" y="55">Rules declared once → Warp · NumPy · GDScript</text>
+        <rect x="370" y="80" width="330" height="54" fill="#2b4bff"/>
+        <text x="382" y="101" fill="#efede7" font-weight="600">GPU · 4,096 worlds, one per lane</text>
+        <text x="382" y="121" fill="#c9d1ff">Assets shared once · ~10 KB state per lane</text>
+        <rect x="370" y="146" width="330" height="34" fill="none" stroke="#0b0b0c" stroke-dasharray="4 3"/>
+        <text x="382" y="167">Godot renders one lane via shared memory</text>
+      </g>
+    </svg>
+    <p class="cap mono" style="margin-top:8px">The same shape twice: simulation on the GPU, presentation on the side.</p>
+  </div>
+
+  <div class="folio mono"><span>Boulder Research · Confidential draft</span><span>2</span></div>
+</section>
+
+<!-- ============ PAGE 3: EVIDENCE ============ -->
+<section class="page">
+  <div class="runner mono"><span>Boulder Research</span><span>02 · What's built</span></div>
+
+  <div class="sec">
+    <div class="sec-n mono">03 / Measured, not projected</div>
+    <h2>A working prototype <span class="serif">with receipts.</span></h2>
+    <p>Every figure below was measured on four AMD Radeon AI PRO R9700 cards and is reproducible from one command in the Warp Core repository. The test scene is deliberately minimal (one physics body, a door, a trigger zone). It proves the architecture, not a shipping game's performance.</p>
+    <div class="stats">
+      <div class="stat"><div class="n">5.05M</div><p>World-steps per second at 4,096 parallel worlds. At a 60 Hz tick, that's roughly 84,000 worlds running at real-time speed.</p></div>
+      <div class="stat"><div class="n">0.0</div><p>Error over 23,820 steps and 144 restarts against the reference, on 30 of 77 state fields. Bit-identical, not just close.</p></div>
+      <div class="stat"><div class="n">10<small>/10</small></div><p>Injected bug classes traced to the right variable, with the right signature: update order, collision gaps, timer overflow, precision loss and more.</p></div>
+      <div class="stat"><div class="n">~1<small>µs</small></div><p>To publish a frame of GPU state to Godot. 10,000 reads against a live writer saw zero partially written frames.</p></div>
+      <div class="stat"><div class="n">239<small>TF</small></div><p>FP8 matrix math on consumer AMD cards (1.91× bf16), often reported as unsupported. Flash attention reaches 175 TFLOP/s.</p></div>
+      <div class="stat"><div class="n">41<small>MB</small></div><p>For all 4,096 worlds of state. Cost scales with what changes, not with copies of the engine.</p></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="fig"><img src="warp-viewer.png" alt="Godot rendering one live lane streamed from the GPU simulation" /></div>
+    <p class="cap mono" style="margin-top:6px">Godot rendering one live lane of the GPU simulation, streamed through shared memory. Tick, sequence number and contact count are read straight from the GPU state.</p>
+  </div>
+
+  <div class="folio mono"><span>Boulder Research · Confidential draft</span><span>3</span></div>
+</section>
+
+<!-- ============ PAGE 4: WHY IT MATTERS ============ -->
+<section class="page">
+  <div class="runner mono"><span>Boulder Research</span><span>03 · Why it matters</span></div>
+
+  <div class="sec">
+    <div class="sec-n mono">04 / What parallel worlds unlock</div>
+    <h2>Simulation is priced per copy.<br><span class="serif">We change the unit.</span></h2>
+    <p>Today, running a world a thousand times means running an engine a thousand times, each with its full memory and CPU cost. Warp Core runs only what changes, in parallel, on hardware a small team can own. Three things follow:</p>
+    <div class="three">
+      <div><h3>Search at scale</h3><p>Thousands of worlds branch from the same saved state and try different actions. That's the exploration that reinforcement learning, Go-Explore-style search and automated testing all depend on.</p></div>
+      <div><h3>Faults with a diagnosis</h3><p>Warp Core derives a cause-and-effect graph from the rules. When a world goes wrong, it traces the fault back to where it started, so a failure arrives with its cause.</p></div>
+      <div><h3>Ground truth for AI</h3><p>Every world produces exact, labeled state at every step. That's training data for world models and an oracle to check their predictions against, so they don't drift into plausible fiction.</p></div>
+    </div>
+    <div class="pull">“A world model learns from the worlds you can afford to run. We make running them cheap.”</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-n mono">05 / Godot is bigger than games</div>
+    <h2>A game engine is <span class="serif">a world simulator with a renderer.</span></h2>
+    <p>Godot is open source, modifiable at any depth and free to deploy, so teams outside games already use it for interactive 3D simulation. Projects such as Godot RL Agents connect it to reinforcement learning. Every one of the uses below benefits from running thousands of worlds instead of one:</p>
+    <div class="domains">
+      <div><div class="mono">Now</div><h3>Game testing</h3><p>Autonomous exploration of builds, with reproducible failures, causal traces and video.</p></div>
+      <div><div class="mono">Next</div><h3>Agent training</h3><p>Massively parallel environments for reinforcement learning and embodied agents.</p></div>
+      <div><div class="mono">Next</div><h3>World-model data</h3><p>Exact state, actions and counterfactuals for training and checking learned simulators.</p></div>
+      <div><div class="mono">Explore</div><h3>Digital twins</h3><p>Facilities, vehicles and logistics simulated in bulk to find rare failures before they happen.</p></div>
+    </div>
+    <p>W4 Games' $18M Series B and Tencent partnership show that capital is flowing into Godot infrastructure. Testing and simulation tooling for the ecosystem has not kept pace.</p>
+  </div>
+
+  <div class="folio mono"><span>Boulder Research · Confidential draft</span><span>4</span></div>
+</section>
+
+<!-- ============ PAGE 5: LIMITS → INVESTMENT ============ -->
+<section class="page tight">
+  <div class="runner mono"><span>Boulder Research</span><span>04 · What the money fixes</span></div>
+
+  <div class="sec">
+    <div class="sec-n mono">06 / Known limits, each with a plan</div>
+    <h2>Every gap is documented.<br><span class="serif">Every gap has a funded fix.</span></h2>
+    <p>Our technical report states the prototype's limits openly. None blocks the architecture. Each is engineering work this round pays for:</p>
+    <div class="map">
+      <div class="map-row">
+        <div class="idx">01</div>
+        <div class="paper"><span class="mono">The limit</span>22 of 77 fields can't be checked against Godot, because Godot's save data never writes them out.</div>
+        <p><span class="mono fix blue" style="display:block;margin-bottom:4px">The fix</span><b>Instrument the engine.</b> Godot is open source, so we extend its C++ to serialize every field. With all 77 visible, the same gates and causal graph enforce full parity.</p>
+      </div>
+      <div class="map-row">
+        <div class="idx">02</div>
+        <div class="paper"><span class="mono">The limit</span>Game scripts can't run on a GPU. 37 fields are still written by scripts, not kernels.</div>
+        <p><span class="mono fix blue" style="display:block;margin-bottom:4px">The fix</span><b>Translate, don't port.</b> An AI-assisted transpiler rewrites game scripts into the rule language: state machines become flags, behavior trees become lookup tables, event logs become ring buffers. The parity gates check every translation, and the causal graph says what to fix when one diverges.</p>
+      </div>
+      <div class="map-row">
+        <div class="idx">03</div>
+        <div class="paper"><span class="mono">The limit</span>Collision events land one step late (74 contacts against Godot's 78 over 120 steps).</div>
+        <p><span class="mono fix blue" style="display:block;margin-bottom:4px">The fix</span><b>Split the contact phase.</b> The delay comes from the update order, not a bug. Separating contact detection from resolution breaks the dependency loop, and the gates verify the change.</p>
+      </div>
+      <div class="map-row">
+        <div class="idx">04</div>
+        <div class="paper"><span class="mono">The limit</span>The test scene is minimal, and the physics models one contact per world.</div>
+        <p><span class="mono fix blue" style="display:block;margin-bottom:4px">The fix</span><b>Port a real game.</b> The state layout already reserves 64 contacts per world. We build the multi-contact solver and port a complete Godot game through every gate.</p>
+      </div>
+      <div class="map-row">
+        <div class="idx">05</div>
+        <div class="paper"><span class="mono">The limit</span>No head-to-head speed comparison yet, and rendering cost is unmeasured.</div>
+        <p><span class="mono fix blue" style="display:block;margin-bottom:4px">The fix</span><b>Publish the benchmark.</b> We measure cost per million world-steps against many headless Godot instances on equal hardware, plus the cost of rendering lanes for vision data.</p>
+      </div>
+      <div class="map-row">
+        <div class="idx">06</div>
+        <div class="paper"><span class="mono">The limit</span>Four-card model training scales poorly on this machine's PCIe layout.</div>
+        <p><span class="mono fix blue" style="display:block;margin-bottom:4px">The fix</span><b>Buy the right topology.</b> This limits training only: the worlds run independently, so simulation needs no cross-card traffic. Better-connected hardware or cloud bursts cover training.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio mono"><span>Boulder Research · Confidential draft</span><span>5</span></div>
+</section>
+
+<!-- ============ PAGE 6: ENDGAME ============ -->
+<section class="page">
+  <div class="runner mono"><span>Boulder Research</span><span>05 · The endgame</span></div>
+
+  <div class="sec">
+    <div class="sec-n mono">07 / Beyond Godot, beyond games</div>
+    <h2>Godot is the entry point.<br><span class="serif">World simulation is the market.</span></h2>
+    <p>Nothing at the core of Warp Core is specific to Godot. The state contract, the rule language, the compiler and the causal graph describe <b>any</b> world that steps forward in time. Adding an engine means adding a front end that reads its logic and an oracle that checks against it. The verified core in the middle stays the same.</p>
+    <svg viewBox="0 0 700 250" width="100%" aria-label="Platform diagram: sources, verified core, outputs">
+      <g font-size="10" fill="#75736d" letter-spacing="1">
+        <text x="0" y="12">SOURCES</text><text x="250" y="12">VERIFIED CORE</text><text x="520" y="12">OUTPUTS</text>
+      </g>
+      <line x1="0" y1="20" x2="700" y2="20" stroke="#0b0b0c" stroke-width="1.5"/>
+      <g font-size="11" fill="#0b0b0c">
+        <rect x="0" y="34" width="190" height="30" fill="#2b4bff"/><text x="10" y="53" fill="#efede7" font-weight="600">Godot · built</text>
+        <rect x="0" y="74" width="190" height="30" fill="none" stroke="#0b0b0c"/><text x="10" y="93">Unity · Unreal</text>
+        <rect x="0" y="114" width="190" height="30" fill="none" stroke="#0b0b0c"/><text x="10" y="133">Robotics sims (MuJoCo)</text>
+        <rect x="0" y="154" width="190" height="30" fill="none" stroke="#0b0b0c"/><text x="10" y="173">Industrial &amp; sensor models</text>
+        <rect x="0" y="194" width="190" height="30" fill="none" stroke="#0b0b0c" stroke-dasharray="4 3"/><text x="10" y="213">Custom simulators</text>
+
+        <rect x="250" y="34" width="210" height="190" fill="#0b0b0c"/>
+        <text x="264" y="60" fill="#8fa3ff" font-weight="600">WARP CORE</text>
+        <text x="264" y="88" fill="#efede7">State contract</text>
+        <text x="264" y="112" fill="#efede7">Rule language (declare once)</text>
+        <text x="264" y="136" fill="#efede7">GPU compiler · parallel lanes</text>
+        <text x="264" y="160" fill="#efede7">Parity gates vs. the source</text>
+        <text x="264" y="184" fill="#efede7">Causal fault graph</text>
+        <text x="264" y="208" fill="#8fa3ff">AI script transpiler · planned</text>
+
+        <rect x="520" y="34" width="180" height="30" fill="#2b4bff"/><text x="530" y="53" fill="#efede7" font-weight="600">Game testing</text>
+        <rect x="520" y="74" width="180" height="30" fill="none" stroke="#0b0b0c"/><text x="530" y="93">Agent &amp; RL training</text>
+        <rect x="520" y="114" width="180" height="30" fill="none" stroke="#0b0b0c"/><text x="530" y="133">World-model data</text>
+        <rect x="520" y="154" width="180" height="30" fill="none" stroke="#0b0b0c"/><text x="530" y="173">Digital-twin search</text>
+        <rect x="520" y="194" width="180" height="30" fill="none" stroke="#0b0b0c" stroke-dasharray="4 3"/><text x="530" y="213">Simulation API</text>
+      </g>
+      <g stroke="#0b0b0c" stroke-width="1.2" fill="none">
+        <path d="M190 49 H250"/><path d="M190 89 H250"/><path d="M190 129 H250"/><path d="M190 169 H250"/><path d="M190 209 H250"/>
+        <path d="M460 49 H520"/><path d="M460 89 H520"/><path d="M460 129 H520"/><path d="M460 169 H520"/><path d="M460 209 H520"/>
+      </g>
+    </svg>
+    <p class="cap mono" style="margin-top:6px">Blue boxes are where we start. Outlined boxes are the expansion path, in rough order.</p>
+  </div>
+
+  <div class="sec">
+    <div class="sec-n mono">08 / Why this compounds</div>
+    <div class="three">
+      <div><h3>Each engine is cheaper</h3><p>The core and its gates are reused. Every new source adds a front end and an oracle, not a new system.</p></div>
+      <div><h3>The transpiler learns</h3><p>Every verified translation becomes training data for the next one, so porting gets faster across games and engines.</p></div>
+      <div><h3>Data is the moat</h3><p>Exact action, state and failure trajectories are scarce. Every world we run produces more, which feeds our world-model work.</p></div>
+    </div>
+    <div class="pull">“Start with games, because they reset. End with any world that steps forward in time.”</div>
+  </div>
+
+  <div class="folio mono"><span>Boulder Research · Confidential draft</span><span>6</span></div>
+</section>
+
+<!-- ============ PAGE 7: USE OF FUNDS + MILESTONES ============ -->
+<section class="page">
+  <div class="runner mono"><span>Boulder Research</span><span>06 · The round</span></div>
+
+  <div class="sec">
+    <div class="sec-n mono">09 / Use of funds <span class="draft">· proposed allocation</span></div>
+    <h2>$500K. <span class="serif">Engineers, an engine and GPUs we own.</span></h2>
+    <div class="fund-bar">
+      <i style="width:58%;background:#0b0b0c"></i>
+      <i style="width:17%;background:#2b4bff"></i>
+      <i style="width:9%;background:#5a5a5e"></i>
+      <i style="width:7%;background:#8fa3ff"></i>
+      <i style="width:4%;background:#b3b0a8"></i>
+      <i style="width:5%;background:#d6d3cb;border-right:0"></i>
+    </div>
+    <table>
+      <tr><th>Category</th><th>Amount</th><th>Share</th><th>What it buys</th></tr>
+      <tr><td><span class="legend-row"><span class="sw" style="background:#0b0b0c"></span><b>Engineering team</b></span></td><td class="num">$290,000</td><td class="num">58%</td><td>Two founders full-time for 18 months, plus a part-time engine and compiler contractor for Godot instrumentation</td></tr>
+      <tr><td><span class="legend-row"><span class="sw" style="background:#2b4bff"></span><b>Compute &amp; hardware</b></span></td><td class="num">$85,000</td><td class="num">17%</td><td>Owned GPUs with better interconnect, plus cloud bursts for baselines and training</td></tr>
+      <tr><td><span class="legend-row"><span class="sw" style="background:#5a5a5e"></span><b>Transpiler &amp; data</b></span></td><td class="num">$45,000</td><td class="num">9%</td><td>Corpus of open-source Godot projects, model inference for the transpiler, trajectory storage</td></tr>
+      <tr><td><span class="legend-row"><span class="sw" style="background:#8fa3ff"></span><b>Design partners &amp; GTM</b></span></td><td class="num">$35,000</td><td class="num">7%</td><td>Pilot support, Godot community presence, events</td></tr>
+      <tr><td><span class="legend-row"><span class="sw" style="background:#b3b0a8"></span><b>Company &amp; IP</b></span></td><td class="num">$20,000</td><td class="num">4%</td><td>Delaware incorporation, IP assignment, contracts</td></tr>
+      <tr><td><span class="legend-row"><span class="sw" style="background:#d6d3cb"></span><b>Reserve</b></span></td><td class="num">$25,000</td><td class="num">5%</td><td>Contingency</td></tr>
+    </table>
+  </div>
+
+  <div class="sec">
+    <div class="sec-n mono">10 / Milestones</div>
+    <h2>What $500K <span class="serif">proves.</span></h2>
+    <div class="timeline">
+      <div class="tl"><div class="when">Months 0–3</div><div><h3>Close the measurable gaps</h3><ul><li>Incorporate, assign IP, close the round</li><li>Instrument Godot to expose all 77 fields; full-parity gates</li><li>Publish the head-to-head benchmark against headless Godot</li></ul></div></div>
+      <div class="tl"><div class="when">Months 3–6</div><div><h3>Run a real game</h3><ul><li>Multi-contact solver and fixed collision timing</li><li>Port a complete small Godot game through every gate</li><li>Three design partners signed (games and simulation)</li></ul></div></div>
+      <div class="tl"><div class="when">Months 6–12</div><div><h3>Automate the port</h3><ul><li>AI script transpiler v1 with parity-checked output</li><li>Exploration agent finding seeded and real bugs, each with a causal trace and video</li><li>Paid pilots on external builds</li></ul></div></div>
+      <div class="tl"><div class="when">Months 12–18</div><div><h3>Prove it generalizes</h3><ul><li>Second source beyond Godot (another engine or a robotics simulator)</li><li>Self-serve Godot plugin and CI integration</li><li>Seed-ready: pilots, unit economics, published report</li></ul></div></div>
+    </div>
+  </div>
+
+  <div class="folio mono"><span>Boulder Research · Confidential draft</span><span>7</span></div>
+</section>
+
+<!-- ============ PAGE 8: TEAM + CLAIMS + CLOSE ============ -->
+<section class="page tight">
+  <div class="runner mono"><span>Boulder Research</span><span>07 · Team &amp; evidence</span></div>
+
+  <div class="sec">
+    <div class="sec-n mono">11 / Team</div>
+    <h2>Built by people who <span class="serif">make simulation fit.</span></h2>
+    <div class="two">
+      <div class="person">
+        <h3>Adhitya Mohan</h3>
+        <div class="role">ML systems &amp; GPU simulation</div>
+        <ul>
+          <li>Author of the Warp Core architecture and technical report, and of the Super Mario World GPU port it extends.</li>
+          <li>Ported all 130 LIBERO manipulation tasks to MuJoCo Warp: thousands of parallel robot environments on one $700 GPU.</li>
+          <li>Sim-to-real RL at AMD Research with upstream ROCm and PyTorch fixes; SHARD (EuroMLSys '26). MS CS, CU Boulder (BASIL lab).</li>
+        </ul>
+      </div>
+      <div class="person">
+        <h3>Chris Kellogg</h3>
+        <div class="role">AI product &amp; infrastructure</div>
+        <ul>
+          <li>AI-native full-stack architect who takes concepts to running, cloud-hosted systems without handoffs.</li>
+          <li>Built and runs Miniloader, a local-AI platform for running agents and models on your own hardware.</li>
+          <li>Track record across media, sports tech, law and real estate, including large-scale data and AI analysis systems for entertainment clients.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-n mono">12 / Evidence and honesty</div>
+    <h2>What exists, <span class="serif">and what we'll prove.</span></h2>
+    <div class="claims">
+      <div>
+        <span class="tag blue">Exists today</span>
+        <ul>
+          <li>Super Mario World running as GPU kernels, with agents completing a full level</li>
+          <li>Warp Core: a Godot state contract, three-backend compiler, causal graph, parity gates and live shared-memory viewer</li>
+          <li>Measured throughput, parity and fault tracing on four consumer GPUs</li>
+          <li>A technical report that survived two independent adversarial audits</li>
+        </ul>
+      </div>
+      <div>
+        <span class="tag" style="color:var(--fault)">This round proves</span>
+        <ul>
+          <li>Full 77-field parity and a real, multi-object game running on the GPU</li>
+          <li>That game scripts can be translated automatically and verified</li>
+          <li>A measured cost advantage over running headless engine instances</li>
+          <li>That studios and simulation teams pay for it, and that the core extends to a second engine</li>
+        </ul>
+      </div>
+    </div>
+    <p style="margin-top:10px;font-size:12.5px">Performance figures are measured on the prototype's minimal test scene, under the conditions stated in the technical report. Plans are labeled as plans.</p>
+  </div>
+
+  <div class="closing">
+    <div class="mono" style="color:rgba(239,237,231,.5);margin-bottom:10px">13 / The ask</div>
+    <h2>$500K to run thousands of worlds, <span class="serif">and learn from every one.</span></h2>
+    <p>Investors: ask for the technical report and a live demo. Studios and simulation teams: become a design partner. chris@kellogg.io</p>
+  </div>
+
+  <div class="folio mono"><span>Boulder Research · Confidential draft</span><span>8</span></div>
+</section>
+</body>
+</html>

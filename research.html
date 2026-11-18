@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Research — Boulder Research</title>
+  <meta name="description" content="Technical essays from Boulder Research that reason from first principles: running game engines as GPU kernels, verifying simulations, measuring hardware, and auditing our own claims." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="projects.css" />
+  <link rel="stylesheet" href="research.css" />
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+    <nav class="nav">
+    <a href="index.html" class="brand" aria-label="Boulder Research home"></a>
+    <div class="nav-links mono">
+      <a href="index.html" class="hide-sm">Home</a>
+      <div class="nav-drop">
+        <a href="projects.html">Projects</a>
+        <button type="button" class="nav-drop-toggle" aria-expanded="false" aria-label="Show the Projects menu">▾</button>
+        <div class="nav-drop-menu">
+          <a href="project-warp-core.html">Warp Core</a>
+          <a href="project-miniloader.html">Miniloader</a>
+          <a href="project-astrolabe.html">Astrolabe</a>
+          <a href="research.html" aria-current="page">Research</a>
+        </div>
+      </div>
+      <a href="investors.html" class="hide-sm">Investors</a>
+      <a href="about.html" class="hide-sm">About</a>
+      <a class="btn" href="mailto:chris@kellogg.io?subject=Research">Get in touch</a>
+  </nav>
+  <script>
+  // T-439: a touchscreen has no hover, so the caret is a real button that
+  // pins the dropdown open on tap (the CSS reads .is-open). Hover still
+  // opens it for a mouse pointer.
+  (function () {
+    const drop = document.querySelector(".nav-drop");
+    const caret = drop && drop.querySelector(".nav-drop-toggle");
+    if (!caret) return;
+    caret.addEventListener("click", () => {
+      const open = drop.classList.toggle("is-open");
+      caret.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  })();
+  </script>
+
+  <header class="page-head">
+    <div class="wrap">
+      <div class="crumbs mono"><a href="index.html">Boulder Research</a> / <a href="projects.html">Projects</a> / Research</div>
+      <p class="ship-note mono"><b>Research feeds the projects.</b> Open-ended work, in service of things that ship.</p>
+      <h1>Reasoned from<br><span class="serif">first principles.</span></h1>
+      <p class="lede">Long-form technical essays on the problems behind our work. Each one starts from what the hardware and software actually are, works through the problem step by step, and gives <b>every number with the condition it holds under</b>, including the results that didn't go our way. An essay becomes a project when it is defined enough to use, pilot and buy — <a href="projects.html">the projects are here</a>.</p>
+    </div>
+  </header>
+
+  <!--
+    Index of articles, grouped by topic. Articles from LinkedIn posts (or
+    any markdown source) go through content/research/ and
+    scripts/build-articles.mjs instead of step 1: see docs/linkedin-intake.md.
+    To add a hand-written article:
+      1. Copy an existing research-*.html page, keep the nav, byline and
+         article-foot structure, and set the <time datetime> and topic.
+      2. Add an <li class="entry"> under the right topic below, newest first
+         (add a new .topic block if it needs one).
+      3. Update the previous/next links in the neighbouring articles.
+      4. Add the file to scripts/publish-site.ps1 when it is ready to publish.
+    Pages generated from markdown (content/research/*.md) get their entry from
+    scripts/build-articles.mjs --index instead of by hand. A source marked
+    `draft: true` is deliberately NOT listed here: it carries a draft-banner,
+    is skipped by publish-site.ps1, and is left out until it is released.
+    scripts/research-index.test.mjs fails if a research page is neither listed
+    below nor flagged as a draft, and if the count in the header above stops
+    matching the entries.
+  -->
+  <section class="alt" id="articles">
+    <div class="wrap">
+      <div class="sec-head mono"><span>Articles</span><span>9 essays · 5 topics</span></div>
+
+      <div class="topic" id="world-models">
+        <div class="topic-head">
+          <span class="mono">Topic 01</span>
+          <h2>World models</h2>
+          <p>A world model is software that learns how an operation and its conditions respond when someone acts.</p>
+          <p class="topic-feeds mono">Feeds <a href="project-warp-core.html">Warp Core</a></p>
+          <p>Why predicting a world is harder than describing it, and which problems more compute doesn't solve.</p>
+        </div>
+        <ol class="entries">
+          <li class="entry">
+            <a href="research-frame-is-not-a-token.html">
+              <time class="mono" datetime="2026-11-10">10 Nov 2026</time>
+              <div>
+                <h3>A frame is not a token. Compute buys fidelity, not correctness.</h3>
+                <p class="dek">The arithmetic of predicting video instead of text, why the cost lives in memory, and why bigger models still get the physics wrong.</p>
+                <span class="meta mono">Boulder Research · ~7 min</span>
+              </div>
+            </a>
+          </li>
+          <li class="entry">
+            <a href="research-four-open-problems.html">
+              <time class="mono" datetime="2026-11-10">10 Nov 2026</time>
+              <div>
+                <h3>Four open problems. A desk-sized target.</h3>
+                <p class="dek">Hybrid state, counterfactual data, a decision-level metric and an evidence cache, and the one-GPU design target they point to.</p>
+                <span class="meta mono">Boulder Research · ~7 min · Design targets</span>
+              </div>
+            </a>
+          </li>
+        </ol>
+      </div>
+
+      <div class="topic" id="simulation">
+        <div class="topic-head">
+          <span class="mono">Topic 02</span>
+          <h2>Simulation architecture</h2>
+          <p class="topic-feeds mono">Feeds <a href="project-warp-core.html">Warp Core</a></p>
+          <p>How a game becomes something a GPU can run thousands of times at once, what has to stay outside, and what that makes cheap. Start with the primer.</p>
+        </div>
+        <ol class="entries">
+          <li class="entry">
+            <a href="research-engine-is-the-window.html">
+              <time class="mono" datetime="2026-11-10">10 Nov 2026</time>
+              <div>
+                <h3>The engine is the window. Thousands of worlds behind it.</h3>
+                <p class="dek">A plain-language primer on the live demo: a ball, a door, and 4,096 copies of the same small game on one GPU.</p>
+                <span class="meta mono">Boulder Research · ~5 min · Primer</span>
+              </div>
+            </a>
+          </li>
+          <li class="entry">
+            <a href="research-engine-as-kernels.html">
+              <time class="mono" datetime="2026-11-10">10 Nov 2026</time>
+              <div>
+                <h3>The engine can't go in the kernel. So the split moves.</h3>
+                <p class="dek">Why Godot can't be compiled into a GPU kernel, where the line goes instead, and the state contract that makes 4,096 copies fit in 41 MB.</p>
+                <span class="meta mono">Adhitya Mohan · ~8 min</span>
+              </div>
+            </a>
+          </li>
+          <li class="entry">
+            <a href="research-gap-or-wall.html">
+              <time class="mono" datetime="2026-11-10">10 Nov 2026</time>
+              <div>
+                <h3>A gap you can close. A wall you route around.</h3>
+                <p class="dek">The prototype's six known limits, sorted into engineering gaps and the one architectural boundary, with the plan for each.</p>
+                <span class="meta mono">Boulder Research · ~7 min</span>
+              </div>
+            </a>
+          </li>
+          <li class="entry">
+            <a href="research-priced-per-copy.html">
+              <time class="mono" datetime="2026-11-10">10 Nov 2026</time>
+              <div>
+                <h3>Simulation is priced per copy. Change the unit.</h3>
+                <p class="dek">What running worlds by their state instead of their engine makes cheap, and why nothing at the core is specific to Godot.</p>
+                <span class="meta mono">Boulder Research · ~6 min</span>
+              </div>
+            </a>
+          </li>
+        </ol>
+      </div>
+
+      <div class="topic" id="verification">
+        <div class="topic-head">
+          <span class="mono">Topic 03</span>
+          <h2>Verification</h2>
+          <p class="topic-feeds mono">Feeds <a href="project-warp-core.html">Warp Core</a></p>
+          <p>Checking that a GPU copy of a world really is that world, and tracing the fault when it isn't.</p>
+        </div>
+        <ol class="entries">
+          <li class="entry">
+            <a href="research-rules-and-faults.html">
+              <time class="mono" datetime="2026-11-10">10 Nov 2026</time>
+              <div>
+                <h3>Rules declared once. A graph that can find a fault.</h3>
+                <p class="dek">One declaration lowered to Warp, numpy and GDScript; an update order and causal graph derived from it; ten mutation gates to prove the graph works.</p>
+                <span class="meta mono">Adhitya Mohan · ~9 min</span>
+              </div>
+            </a>
+          </li>
+        </ol>
+      </div>
+
+      <div class="topic" id="hardware">
+        <div class="topic-head">
+          <span class="mono">Topic 04</span>
+          <h2>Hardware</h2>
+          <p class="topic-feeds mono">Feeds <a href="project-warp-core.html">Warp Core</a></p>
+          <p>What consumer GPUs actually deliver, measured layer by layer, with the arithmetic shown.</p>
+        </div>
+        <ol class="entries">
+          <li class="entry">
+            <a href="research-four-gpus.html">
+              <time class="mono" datetime="2026-11-10">10 Nov 2026</time>
+              <div>
+                <h3>Four GPUs, measured. The topology is the ceiling.</h3>
+                <p class="dek">Fast links, settings that barely matter, and two PCIe switches that decide when four cards beat one.</p>
+                <span class="meta mono">Adhitya Mohan · ~8 min</span>
+              </div>
+            </a>
+          </li>
+        </ol>
+      </div>
+
+      <div class="topic" id="method">
+        <div class="topic-head">
+          <span class="mono">Topic 05</span>
+          <h2>Method</h2>
+          <p class="topic-feeds mono">How every project here is checked</p>
+          <p>How we check our own claims, and what goes wrong when the check and the claim come from the same place.</p>
+        </div>
+        <ol class="entries">
+          <li class="entry">
+            <a href="research-two-audits.html">
+              <time class="mono" datetime="2026-11-10">10 Nov 2026</time>
+              <div>
+                <h3>The test passed. The claim was still wrong.</h3>
+                <p class="dek">Two adversarial audits refuted a sign-off we'd already given. Every defect had passed a test, for the same reason.</p>
+                <span class="meta mono">Adhitya Mohan · ~6 min</span>
+              </div>
+            </a>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!--
+    Investor track. Kept apart from the articles on purpose: the briefs and
+    summaries are fundraising documents (asks, use of funds, milestones),
+    the articles above are not. Research articles never link into this
+    track except from here.
+  -->
+  <section class="track" id="investors" aria-labelledby="investors-title">
+    <div class="wrap">
+      <div class="track-box">
+        <span class="track-label mono">Separate track · Investor materials</span>
+        <h2 id="investors-title">Looking for <span class="serif">the briefs?</span></h2>
+        <p>Our investor briefs cover the same work from a different angle: the round, the use of funds, milestones and team. They're drafts for discussion, kept on their own page so they aren't mistaken for research.</p>
+        <a class="btn ghost" href="investors.html">Investor materials →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta" id="contact">
+    <div class="wrap">
+      <h2>Working on<br><span class="serif">something similar?</span></h2>
+      <p class="body">If one of these problems is yours too, we'd like to hear how you're approaching it.</p>
+      <div class="ctas">
+        <a class="btn" href="mailto:chris@kellogg.io?subject=Research">Start a conversation →</a>
+        <a class="btn ghost" href="projects.html">See our projects</a>
+      </div>
+      <footer class="mono">
+        <span>© 2026 Boulder Research</span>
+        <a href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+        <span class="portfolio-links">Portfolio: <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person</a> · <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware</a></span>
+        <span>Intelligence for interactive worlds</span>
+      </footer>
+    </div>
+  </section>
+</body>
+</html>

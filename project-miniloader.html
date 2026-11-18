@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Miniloader — Boulder Research</title>
+  <meta name="description" content="Miniloader is a research project of Boulder Research that ships: a visual control panel for running agents, models and tools on your own machine, with modules that slot in and wire themselves up." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="projects.css" />
+
+<style id="show-all-panels">
+  .decode { min-height: 0 !important; display: flex; flex-direction: column; gap: 28px; }
+  .card, .card.active {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    margin: 0 0 8px;
+  }
+</style>
+
+</head>
+<body>
+    <nav class="nav">
+    <a href="index.html" class="brand" aria-label="Boulder Research home"></a>
+    <div class="nav-links mono">
+      <a href="index.html" class="hide-sm">Home</a>
+      <div class="nav-drop">
+        <a href="projects.html">Projects</a>
+        <button type="button" class="nav-drop-toggle" aria-expanded="false" aria-label="Show the Projects menu">▾</button>
+        <div class="nav-drop-menu">
+          <a href="project-warp-core.html">Warp Core</a>
+          <a href="project-miniloader.html" aria-current="page">Miniloader</a>
+          <a href="project-astrolabe.html">Astrolabe</a>
+          <a href="research.html">Research</a>
+        </div>
+      </div>
+      <a href="investors.html" class="hide-sm">Investors</a>
+      <a href="about.html" class="hide-sm">About</a>
+      <a class="btn" href="mailto:chris@kellogg.io?subject=Research">Get in touch</a>
+  </nav>
+  <script>
+  // T-439: a touchscreen has no hover, so the caret is a real button that
+  // pins the dropdown open on tap (the CSS reads .is-open). Hover still
+  // opens it for a mouse pointer.
+  (function () {
+    const drop = document.querySelector(".nav-drop");
+    const caret = drop && drop.querySelector(".nav-drop-toggle");
+    if (!caret) return;
+    caret.addEventListener("click", () => {
+      const open = drop.classList.toggle("is-open");
+      caret.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  })();
+  </script>
+
+  <header class="page-head">
+    <div class="wrap">
+      <div class="crumbs mono"><a href="index.html">Boulder Research</a> / <a href="projects.html">Projects</a> / Miniloader</div>
+      <p class="ship-note mono"><b>Project 02.</b> A research project that ships. Essays about it join the Research track.</p>
+      <div class="status-bar mono">
+        <span class="status">Research project · Early access</span>
+        <span class="tag">Local AI</span><span class="tag">Your own hardware</span><span class="tag">Agents, models &amp; tools</span>
+      </div>
+      <h1>Miniloader.<br><span class="serif">AI on your own hardware.</span></h1>
+      <p class="lede">Miniloader is a <b>research project of Boulder Research</b> that ships: a <b>visual control panel</b> for running agents, models and tools on your own machine. You slot in modules, they wire themselves up, and every one shows its status live.</p>
+      <div class="ctas">
+        <a class="btn" href="https://miniloader.ai" target="_blank" rel="noopener">Visit miniloader.ai ↗</a>
+        <a class="btn ghost" href="#how-it-works">How it works</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="alt" id="what">
+    <div class="wrap">
+      <div class="sec-head mono"><span>01 / What it is</span><span>Local AI</span></div>
+      <div class="split">
+        <div>
+          <h2>Run it<br><span class="serif">where your data lives.</span></h2>
+          <p class="body">Miniloader runs agents, models and tools on your own hardware. Its work feeds the on-prem story at Boulder Research, where customers need AI that runs on their own machines.</p>
+        </div>
+        <div class="features">
+          <div><span class="mono">Agents, models, tools</span><p>One control panel for the pieces you run locally.</p></div>
+          <div><span class="mono">Your hardware</span><p>Runs on your own machine rather than a hosted service.</p></div>
+          <div><span class="mono">No terminal</span><p>Modules are chosen and connected from the panel, not from a command line.</p></div>
+          <div><span class="mono">Self-hosted</span><p>No subscription and no usage tracked by us — the run is on your machine.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-it-works">
+    <div class="wrap">
+      <div class="sec-head mono"><span>02 / How it works</span><span>Modules, wired up</span></div>
+      <div class="split">
+        <div>
+          <h2>Slot in modules.<br><span class="serif">They wire themselves up.</span></h2>
+          <p class="body">Miniloader is a rack of modules that plug into one another: an orchestration loop on top, a model backend underneath, then the tools, the database and the files. Pick a preset, add the modules you need, and the panel makes the connections. Each module reports its status live, so you can see what is running and where a request went.</p>
+        </div>
+        <div class="features">
+          <div><span class="mono">Agent Engine</span><p>The orchestration loop for chat turns, tool calls and streamed responses. It expects an OpenAI-compatible model backend upstream.</p></div>
+          <div><span class="mono">Local Brain</span><p>Local inference: GGUF models loaded through llama.cpp, run in its own process so a crashed model does not take the panel down.</p></div>
+          <div><span class="mono">Cloud Brain</span><p>An in-process LiteLLM gateway that presents cloud providers as the same OpenAI-compatible endpoint the local modules use.</p></div>
+          <div><span class="mono">LiveKit Voice</span><p>Realtime speech in and out — speech-to-text and text-to-speech.</p></div>
+          <div><span class="mono">Installatron</span><p>Installs and auto-configures OpenClaw against your local AI server setup.</p></div>
+          <div><span class="mono">Ngrok Tunnel</span><p>Publishes a local service with a public URL, and reports the tunnel's status.</p></div>
+        </div>
+      </div>
+      <p class="body" style="margin-top:28px">Seventeen modules ship with it: Local Brain, Chat Terminal, GPT Server, Database, File Access and the rest. A model runs locally, in the cloud, or both, side by side in the same panel.</p>
+    </div>
+  </section>
+
+  <section class="alt" id="agents">
+    <div class="wrap">
+      <div class="sec-head mono"><span>03 / The agents it runs</span><span>Not another agent</span></div>
+      <div class="split">
+        <div>
+          <h2>Plug in the agent<br><span class="serif">you already use.</span></h2>
+          <p class="body">Miniloader is not an agent of its own. It is the engine underneath one: the agent talks to the panel, the panel routes the turn to a model — local or cloud — and hands the tools back.</p>
+        </div>
+        <div class="features">
+          <div><span class="mono">Hermes Agent</span><p>NousResearch's instruction-tuned agent.</p></div>
+          <div><span class="mono">OpenClaw</span><p>Personal assistant with desktop, tools and workflows.</p></div>
+          <div><span class="mono">OpenCode · Aider · Goose</span><p>Open-source coding agents, terminal and CLI.</p></div>
+          <div><span class="mono">Cline · Roo Code · Kilo Code</span><p>Bring-your-own-key agents in VS Code and JetBrains.</p></div>
+          <div><span class="mono">LangChain</span><p>Frameworks that compose LLM applications.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="status">
+    <div class="wrap">
+      <div class="sec-head mono"><span>04 / Where it is</span><span>Early access</span></div>
+      <div class="split">
+        <h2>Local for the routine work,<br><span class="serif">premium tokens for the rest.</span></h2>
+        <p class="body">The point is to stop burning premium tokens on work a local model can do. Presets and auto-wiring get you running in minutes, with full visibility into what each turn used. It ships working examples — AC Coach, real-time AI coaching for Assetto Corsa — and is in early access on its own domain, <a href="https://miniloader.ai" target="_blank" rel="noopener">miniloader.ai</a>, not on boulderresearch.ai.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt" id="astrolabe">
+    <div class="wrap">
+      <div class="sec-head mono"><span>05 / Hosted sibling</span><span>Not a research project</span></div>
+      <div class="split">
+        <h2>Prefer it<br><span class="serif">hosted?</span></h2>
+        <p class="body"><a href="project-astrolabe.html">Astrolabe</a> is the hosted counterpart to Miniloader: a subscription service built on the same agent stack. It is an adjacent product, not a Boulder Research research project.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta" id="contact">
+    <div class="wrap">
+      <h2>Run AI<br><span class="serif">on your own hardware.</span></h2>
+      <p class="body">Questions about Miniloader, or how it connects to Boulder Research? Get in touch.</p>
+      <div class="ctas">
+        <a class="btn" href="mailto:chris@kellogg.io?subject=Miniloader">Ask about Miniloader →</a>
+        <a class="btn ghost" href="projects.html">All projects</a>
+      </div>
+      <footer class="mono">
+        <span>© 2026 Boulder Research</span>
+        <a href="mailto:chris@kellogg.io">chris@kellogg.io</a>
+        <span class="portfolio-links">Portfolio: <a href="https://kellogg.io/" target="_blank" rel="noopener">Chris Kellogg: the person</a> · <a href="https://miniloader.ai/" target="_blank" rel="noopener">Miniloader: local AI on your own hardware</a></span>
+        <span>Miniloader · Research project</span>
+      </footer>
+    </div>
+  </section>
+</body>
+</html>
